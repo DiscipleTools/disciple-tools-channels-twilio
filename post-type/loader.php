@@ -18,20 +18,20 @@ add_filter( 'dt_post_type_modules', function( $modules ){
      * @todo Update the starter in the array below 'starter_base'. Follow the pattern.
      * @todo Add more modules by adding a new array element. i.e. 'starter_base_two'.
      */
-    $modules["starter_base"] = [
+    $modules["channels_twilio_base"] = [
         "name" => "Starter",
-        "enabled" => true,
+        "enabled" => false,
         "locked" => true,
         "prerequisites" => [ "contacts_base" ],
-        "post_type" => "starter_post_type",
-        "description" => "Default starter functionality"
+        "post_type" => "channels_twilio",
+        "description" => "Default channels twilio functionality"
     ];
 
     return $modules;
 }, 20, 1 );
 
 require_once 'module-base.php';
-Disciple_Tools_Plugin_Starter_Template_Base::instance();
+Disciple_Tools_Channels_Twilio_Base::instance();
 
 /**
  * @todo require_once and load additional modules

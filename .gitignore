@@ -1,2 +1,5 @@
 vendor/*
+!vendor/autoload.php
+!vendor/composer
+!vendor/twilio
 composer.lock

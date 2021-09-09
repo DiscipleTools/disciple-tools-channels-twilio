@@ -2,5 +2,8 @@
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "*",
         "wp-coding-standards/wpcs": "*"
+    },
+    "require": {
+        "twilio/sdk": "^6.28"
     }
 }
