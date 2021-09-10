@@ -17,9 +17,32 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
         ], filemtime( dirname( __FILE__ ) . '/js/general-tab.js' ), true );
         wp_localize_script(
             "dt_channels_twilio_general_script", "dt_channels_twilio", array(
-                't_b_d' => []
+                't_b_c' => []
             )
         );
+
+        // First, handle update submissions
+        $this->process_updates();
+    }
+
+    private function process_updates() {
+        if ( isset( $_POST['twilio_main_col_manage_form_nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['twilio_main_col_manage_form_nonce'] ) ), 'twilio_main_col_manage_form_nonce' ) ) {
+            if ( isset( $_POST['twilio_main_col_manage_form_enabled'] ) ) {
+                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_enabled, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_enabled'] ) ) );
+            }
+            if ( isset( $_POST['twilio_main_col_manage_form_sid'] ) ) {
+                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_sid, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_sid'] ) ) );
+            }
+            if ( isset( $_POST['twilio_main_col_manage_form_token'] ) ) {
+                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_token, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_token'] ) ) );
+            }
+            if ( isset( $_POST['twilio_main_col_manage_form_number_id'] ) ) {
+                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_number_id, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_number_id'] ) ) );
+            }
+            if ( isset( $_POST['twilio_main_col_manage_form_contact_field'] ) ) {
+                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_contact_field, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_contact_field'] ) ) );
+            }
+        }
     }
 
     public function content() {
@@ -99,13 +122,17 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
             <tr>
                 <td style="vertical-align: middle;">Enabled</td>
                 <td>
-                    <input type="checkbox" id="twilio_main_col_manage_enabled"/>
+                    <?php $enabled = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_enabled ); ?>
+                    <input type="checkbox"
+                           id="twilio_main_col_manage_enabled" <?php echo esc_attr( ! empty( $enabled ) && boolval( $enabled ) ? 'checked' : '' ); ?> />
                 </td>
             </tr>
             <tr>
                 <td style="vertical-align: middle;">SID</td>
                 <td>
-                    <input style="min-width: 100%;" type="password" id="twilio_main_col_manage_sid"/>
+                    <?php $sid = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_sid ); ?>
+                    <input style="min-width: 100%;" type="password" id="twilio_main_col_manage_sid"
+                           value="<?php echo esc_attr( ! empty( $sid ) ? $sid : '' ); ?>"/>
                     <br>
                     <input type="checkbox" id="twilio_main_col_manage_sid_show">Show SID
                 </td>
@@ -113,7 +140,9 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
             <tr>
                 <td style="vertical-align: middle;">Token</td>
                 <td>
-                    <input style="min-width: 100%;" type="password" id="twilio_main_col_manage_token"/>
+                    <?php $token = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_token ); ?>
+                    <input style="min-width: 100%;" type="password" id="twilio_main_col_manage_token"
+                           value="<?php echo esc_attr( ! empty( $token ) ? $token : '' ); ?>"/>
                     <br>
                     <input type="checkbox" id="twilio_main_col_manage_token_show">Show Token
                 </td>
@@ -123,6 +152,15 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                 <td>
                     <select style="min-width: 100%;" id="twilio_main_col_manage_numbers">
                         <option disabled selected value>-- select twilio sender number --</option>
+
+                        <?php
+                        $phone_numbers = Disciple_Tools_Twilio_API::list_phone_numbers();
+                        $number_id     = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_number_id );
+                        foreach ( $phone_numbers ?? [] as $number ) {
+                            $selected = ! empty( $number_id ) && $number_id === $number['id'] ? 'selected' : '';
+                            echo '<option ' . esc_attr( $selected ) . ' value="' . esc_attr( $number['id'] ) . '">' . esc_attr( $number['name'] . ' [' . $number['number'] . ']' ) . '</option>';
+                        }
+                        ?>
 
                     </select>
                 </td>
@@ -135,16 +173,16 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
 
                         <?php
                         $filtered_fields = $this->fetch_filtered_fields();
-                        if ( ! empty( $filtered_fields ) ) {
-                            foreach ( $filtered_fields as $filtered ) {
-                                if ( isset( $filtered['fields'] ) && ! empty( $filtered['fields'] ) ) {
-                                    echo '<option disabled value>-- ' . esc_attr( $filtered['name'] ) . ' --</option>';
+                        $contact_field   = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_contact_field );
+                        foreach ( $filtered_fields ?? [] as $filtered ) {
+                            if ( isset( $filtered['fields'] ) && ! empty( $filtered['fields'] ) ) {
+                                echo '<option disabled value>-- ' . esc_attr( $filtered['name'] ) . ' --</option>';
 
-                                    // Display filtered fields
-                                    foreach ( $filtered['fields'] as $field ) {
-                                        $value = esc_attr( $filtered['post_type'] ) . '+' . esc_attr( $field['id'] );
-                                        echo '<option value="' . esc_attr( $value ) . '">' . esc_attr( $field['name'] ) . '</option>';
-                                    }
+                                // Display filtered fields
+                                foreach ( $filtered['fields'] as $field ) {
+                                    $value    = esc_attr( $filtered['post_type'] ) . '+' . esc_attr( $field['id'] );
+                                    $selected = ! empty( $contact_field ) && $contact_field === $value ? 'selected' : '';
+                                    echo '<option ' . esc_attr( $selected ) . ' value="' . esc_attr( $value ) . '">' . esc_attr( $field['name'] ) . '</option>';
                                 }
                             }
                         }
@@ -162,6 +200,23 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
 
         <!-- [Submission Form] -->
         <form method="post" id="twilio_main_col_manage_form">
+            <input type="hidden" id="twilio_main_col_manage_form_nonce" name="twilio_main_col_manage_form_nonce"
+                   value="<?php echo esc_attr( wp_create_nonce( 'twilio_main_col_manage_form_nonce' ) ) ?>"/>
+
+            <input type="hidden" value="" id="twilio_main_col_manage_form_enabled"
+                   name="twilio_main_col_manage_form_enabled"/>
+
+            <input type="hidden" value="" id="twilio_main_col_manage_form_sid"
+                   name="twilio_main_col_manage_form_sid"/>
+
+            <input type="hidden" value="" id="twilio_main_col_manage_form_token"
+                   name="twilio_main_col_manage_form_token"/>
+
+            <input type="hidden" value="" id="twilio_main_col_manage_form_number_id"
+                   name="twilio_main_col_manage_form_number_id"/>
+
+            <input type="hidden" value="" id="twilio_main_col_manage_form_contact_field"
+                   name="twilio_main_col_manage_form_contact_field"/>
 
         </form>
         <?php
