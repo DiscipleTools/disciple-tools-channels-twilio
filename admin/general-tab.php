@@ -36,8 +36,11 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
             if ( isset( $_POST['twilio_main_col_manage_form_token'] ) ) {
                 Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_token, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_token'] ) ) );
             }
-            if ( isset( $_POST['twilio_main_col_manage_form_number_id'] ) ) {
-                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_number_id, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_number_id'] ) ) );
+            if ( isset( $_POST['twilio_main_col_manage_form_service'] ) ) {
+                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_service, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_service'] ) ) );
+            }
+            if ( isset( $_POST['twilio_main_col_manage_form_msg_service_id'] ) ) {
+                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_msg_service_id, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_msg_service_id'] ) ) );
             }
             if ( isset( $_POST['twilio_main_col_manage_form_contact_field'] ) ) {
                 Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_contact_field, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_contact_field'] ) ) );
@@ -148,17 +151,32 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                 </td>
             </tr>
             <tr>
-                <td style="vertical-align: middle;">Sender Number</td>
+                <td style="vertical-align: middle;">Service</td>
                 <td>
-                    <select style="min-width: 100%;" id="twilio_main_col_manage_numbers">
-                        <option disabled selected value>-- select twilio sender number --</option>
+                    <select style="min-width: 100%;" id="twilio_main_col_manage_service">
+                        <?php
+                        $services        = Disciple_Tools_Twilio_API::list_services();
+                        $current_service = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_service );
+                        foreach ( $services ?? [] as $service ) {
+                            $selected = ! empty( $current_service ) && $current_service === $service['id'] ? 'selected' : '';
+                            echo '<option ' . esc_attr( $selected ) . ' value="' . esc_attr( $service['id'] ) . '">' . esc_attr( $service['name'] ) . '</option>';
+                        }
+                        ?>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align: middle;">Messaging Service</td>
+                <td>
+                    <select style="min-width: 100%;" id="twilio_main_col_manage_msg_service">
+                        <option disabled selected value>-- select twilio messaging service --</option>
 
                         <?php
-                        $phone_numbers = Disciple_Tools_Twilio_API::list_phone_numbers();
-                        $number_id     = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_number_id );
-                        foreach ( $phone_numbers ?? [] as $number ) {
-                            $selected = ! empty( $number_id ) && $number_id === $number['id'] ? 'selected' : '';
-                            echo '<option ' . esc_attr( $selected ) . ' value="' . esc_attr( $number['id'] ) . '">' . esc_attr( $number['name'] . ' [' . $number['number'] . ']' ) . '</option>';
+                        $messaging_services = Disciple_Tools_Twilio_API::list_messaging_services();
+                        $msg_service_id     = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_msg_service_id );
+                        foreach ( $messaging_services ?? [] as $service ) {
+                            $selected = ! empty( $msg_service_id ) && $msg_service_id === $service['id'] ? 'selected' : '';
+                            echo '<option ' . esc_attr( $selected ) . ' value="' . esc_attr( $service['id'] ) . '">' . esc_attr( $service['name'] ) . '</option>';
                         }
                         ?>
 
@@ -212,8 +230,11 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
             <input type="hidden" value="" id="twilio_main_col_manage_form_token"
                    name="twilio_main_col_manage_form_token"/>
 
-            <input type="hidden" value="" id="twilio_main_col_manage_form_number_id"
-                   name="twilio_main_col_manage_form_number_id"/>
+            <input type="hidden" value="" id="twilio_main_col_manage_form_service"
+                   name="twilio_main_col_manage_form_service"/>
+
+            <input type="hidden" value="" id="twilio_main_col_manage_form_msg_service_id"
+                   name="twilio_main_col_manage_form_msg_service_id"/>
 
             <input type="hidden" value="" id="twilio_main_col_manage_form_contact_field"
                    name="twilio_main_col_manage_form_contact_field"/>

@@ -1,30 +1,22 @@
 [![Build Status](https://travis-ci.com/DiscipleTools/disciple-tools-channels-twilio.svg?branch=master)](https://travis-ci.com/DiscipleTools/disciple-tools-channels-twilio)
 
-# Disciple Tools - Name
+# Disciple Tools - Channels - Twilio
 
-Description Description Description Description Description Description Description
-Description Description Description Description Description Description Description
-
-## Purpose
-
-Purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose
-Purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose
-
-Purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose
-Purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose
+Disciple Tools - Channels - Twilio plugin; captures settings enabling communication with target Twilio platform.
 
 ## Usage
 
 #### Will Do
 
-- Item
-- Item
-- Item
+- Enable/Disable plugin execution.
+- Specify target Twilio SID and Access Tokens.
+- Switch between SMS and WhatsApp services.
+- Select pre-configured Twilio Messaging Services.
+- Select D.T. contacts field to source recipient phone numbers.
 
 #### Will Not Do
 
-- Item
-- Item
+- Your weekly shopping...! ;)
 
 ## Requirements
 
@@ -38,13 +30,9 @@ Purpose purpose purpose purpose purpose purpose purpose purpose purpose purpose 
 ## Contribution
 
 Contributions welcome. You can report issues and bugs in the
-[Issues](https://github.com/DiscipleTools/disciple-tools-channels-twilio/issues) section of the repo. You can present ideas
-in the [Discussions](https://github.com/DiscipleTools/disciple-tools-channels-twilio/discussions) section of the repo. And
-code contributions are welcome using the [Pull Request](https://github.com/DiscipleTools/disciple-tools-channels-twilio/pulls)
+[Issues](https://github.com/DiscipleTools/disciple-tools-channels-twilio/issues) section of the repo. You can present
+ideas in the [Discussions](https://github.com/DiscipleTools/disciple-tools-channels-twilio/discussions) section of the
+repo. And code contributions are welcome using
+the [Pull Request](https://github.com/DiscipleTools/disciple-tools-channels-twilio/pulls)
 system for git. For a more details on contribution see the
 [contribution guidelines](https://github.com/DiscipleTools/disciple-tools-channels-twilio/blob/master/CONTRIBUTING.md).
-
-
-## Screenshots
-
-![screenshot](documentation/community/starter-banners/banner-blue-green.png)
