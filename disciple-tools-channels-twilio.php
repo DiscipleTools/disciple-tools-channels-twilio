@@ -111,15 +111,15 @@ class Disciple_Tools_Channels_Twilio {
         /**
          * @todo Decide if you want to add new charts to the metrics section
          * To remove: delete the line below and remove the folder named /charts
-         */
+         *
         if ( strpos( dt_get_url_path(), 'metrics' ) !== false || ( $is_rest && strpos( dt_get_url_path(), 'disciple-tools-channels-twilio-metrics' ) !== false ) ) {
             require_once( 'charts/charts-loader.php' );  // add custom charts to the metrics area
-        }
+        }*/
 
         /**
          * @todo Decide if you want to add a custom tile or settings page tile
          * To remove: delete the lines below and remove the folder named /tile
-         */
+         *
         require_once( 'tile/custom-tile.php' ); // add custom tile
         if ( 'settings' === dt_get_url_path() && ! $is_rest ) {
             require_once( 'tile/settings-tile.php' ); // add custom settings page tile
@@ -160,6 +160,7 @@ class Disciple_Tools_Channels_Twilio {
 
         require_once( 'vendor/autoload.php' );
         require_once( 'twilio-api/twilio-api.php' );
+        require_once( 'twilio-api/twilio-filters.php' );
 
     }
 
