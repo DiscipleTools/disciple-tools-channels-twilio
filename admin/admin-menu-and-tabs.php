@@ -46,9 +46,9 @@ class Disciple_Tools_Channels_Twilio_Menu {
      * Loads scripts and styles.
      */
     public function load_scripts( $hook ) {
-        if ( isset( $_GET["page"] ) && ( $_GET["page"] === $this->token ) ) {
-            // TODO -> If Needed...!
-        }
+//        if ( isset( $_GET["page"] ) && ( $_GET["page"] === $this->token ) ) {
+//            // TODO -> If Needed...!
+//        }
     }
 
     /**
