@@ -70,18 +70,18 @@ class Disciple_Tools_Twilio_API {
             $twilio = new Client( self::get_option( self::$option_twilio_sid ), self::get_option( self::$option_twilio_token ) );
 
             // Fetch available incoming phone numbers
-            $incoming_phone_numbers = $twilio->incomingPhoneNumbers->read( [], 20 );
+            $incoming_phone_numbers = $twilio->incomingPhoneNumbers->read( [], 20 ); //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
             // Iterate over results
             if ( ! empty( $incoming_phone_numbers ) ) {
                 foreach ( $incoming_phone_numbers as $number ) {
 
                     // Capture number details
-                    if ( isset( $number->sid ) && isset( $number->phoneNumber ) && isset( $number->friendlyName ) ) {
+                    if ( isset( $number->sid ) && isset( $number->phoneNumber ) && isset( $number->friendlyName ) ) { //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
                         $phone_numbers[] = [
                             'id'     => $number->sid,
-                            'number' => $number->phoneNumber,
-                            'name'   => $number->friendlyName
+                            'number' => $number->phoneNumber, //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+                            'name'   => $number->friendlyName //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
                         ];
                     }
                 }
@@ -113,10 +113,10 @@ class Disciple_Tools_Twilio_API {
                 foreach ( $services as $service ) {
 
                     // Capture service details
-                    if ( isset( $service->sid ) && isset( $service->friendlyName ) ) {
+                    if ( isset( $service->sid ) && isset( $service->friendlyName ) ) { //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
                         $msg_services[] = [
                             'id'   => $service->sid,
-                            'name' => $service->friendlyName
+                            'name' => $service->friendlyName //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
                         ];
                     }
                 }
