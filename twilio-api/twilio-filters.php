@@ -18,5 +18,5 @@ function dt_twilio_sending_channels( $channels ) {
 }
 
 function dt_twilio_sending_channel_send( $params ): bool {
-    return Disciple_Tools_Twilio_API::is_enabled() && Disciple_Tools_Twilio_API::send( $params['user_id'], $params['message'] );
+    return Disciple_Tools_Twilio_API::is_enabled() && Disciple_Tools_Twilio_API::send( $params['user'], $params['message'] );
 }
