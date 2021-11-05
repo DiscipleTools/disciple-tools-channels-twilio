@@ -28,7 +28,6 @@ jQuery(function ($) {
     let token = $('#twilio_main_col_manage_token').val();
     let service = $('#twilio_main_col_manage_service').val();
     let msg_service_id = $('#twilio_main_col_manage_msg_service').val();
-    let contact_field = $('#twilio_main_col_manage_fields').val();
 
     // Update submission form
     $('#twilio_main_col_manage_form_enabled').val(enabled);
@@ -36,7 +35,6 @@ jQuery(function ($) {
     $('#twilio_main_col_manage_form_token').val(token);
     $('#twilio_main_col_manage_form_service').val(service);
     $('#twilio_main_col_manage_form_msg_service_id').val(msg_service_id);
-    $('#twilio_main_col_manage_form_contact_field').val(contact_field);
 
     // Post submission form
     $('#twilio_main_col_manage_form').submit();

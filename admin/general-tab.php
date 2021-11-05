@@ -42,9 +42,6 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
             if ( isset( $_POST['twilio_main_col_manage_form_msg_service_id'] ) ) {
                 Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_msg_service_id, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_msg_service_id'] ) ) );
             }
-            if ( isset( $_POST['twilio_main_col_manage_form_contact_field'] ) ) {
-                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_contact_field, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_contact_field'] ) ) );
-            }
         }
     }
 
@@ -183,32 +180,6 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                     </select>
                 </td>
             </tr>
-            <tr>
-                <td style="vertical-align: middle;">Contact Field</td>
-                <td>
-                    <select style="min-width: 100%;" id="twilio_main_col_manage_fields">
-                        <option disabled selected value>-- select field containing contact information --</option>
-
-                        <?php
-                        $filtered_fields = $this->fetch_filtered_fields();
-                        $contact_field   = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_contact_field );
-                        foreach ( $filtered_fields ?? [] as $filtered ) {
-                            if ( isset( $filtered['fields'] ) && ! empty( $filtered['fields'] ) ) {
-                                echo '<option disabled value>-- ' . esc_attr( $filtered['name'] ) . ' --</option>';
-
-                                // Display filtered fields
-                                foreach ( $filtered['fields'] as $field ) {
-                                    $value    = esc_attr( $filtered['post_type'] ) . '+' . esc_attr( $field['id'] );
-                                    $selected = ! empty( $contact_field ) && $contact_field === $value ? 'selected' : '';
-                                    echo '<option ' . esc_attr( $selected ) . ' value="' . esc_attr( $value ) . '">' . esc_attr( $field['name'] ) . '</option>';
-                                }
-                            }
-                        }
-                        ?>
-
-                    </select>
-                </td>
-            </tr>
         </table>
         <br>
         <span style="float:right;">
@@ -235,51 +206,7 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
 
             <input type="hidden" value="" id="twilio_main_col_manage_form_msg_service_id"
                    name="twilio_main_col_manage_form_msg_service_id"/>
-
-            <input type="hidden" value="" id="twilio_main_col_manage_form_contact_field"
-                   name="twilio_main_col_manage_form_contact_field"/>
-
         </form>
         <?php
-    }
-
-    private function fetch_filtered_fields(): array {
-        $filtered_fields = [];
-        $supported_types = [
-            'communication_channel'
-        ];
-
-        $post_types = DT_Posts::get_post_types();
-        if ( ! empty( $post_types ) ) {
-            foreach ( $post_types as $post_type ) {
-
-                $fields             = [];
-                $post_type_settings = DT_Posts::get_post_settings( $post_type );
-
-                // Iterate over fields in search of comms fields
-                foreach ( $post_type_settings['fields'] as $key => $field ) {
-                    if ( isset( $field['type'] ) && in_array( $field['type'], $supported_types ) ) {
-
-                        // Capture filtered field
-                        $fields[] = [
-                            'id'   => $key,
-                            'name' => $field['name'],
-                            'type' => $field['type']
-                        ];
-                    }
-                }
-
-                // If filtered fields detected, package and return...
-                if ( ! empty( $fields ) ) {
-                    $filtered_fields[ $post_type ] = [
-                        'post_type' => $post_type,
-                        'name'      => $post_type_settings['label_plural'],
-                        'fields'    => $fields
-                    ];
-                }
-            }
-        }
-
-        return $filtered_fields;
     }
 }

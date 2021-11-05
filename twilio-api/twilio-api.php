@@ -20,7 +20,6 @@ class Disciple_Tools_Twilio_API {
     public static $option_twilio_service = 'dt_twilio_service';
     public static $option_twilio_msg_service_id = 'dt_twilio_msg_service_id';
     public static $option_twilio_number_id = 'dt_twilio_number_id';
-    public static $option_twilio_contact_field = 'dt_twilio_contact_field';
 
     public static function is_enabled(): bool {
         $enabled = get_option( self::$option_twilio_enabled );
@@ -70,20 +69,24 @@ class Disciple_Tools_Twilio_API {
             $twilio = new Client( self::get_option( self::$option_twilio_sid ), self::get_option( self::$option_twilio_token ) );
 
             // Fetch available incoming phone numbers
-            $incoming_phone_numbers = $twilio->incomingPhoneNumbers->read( [], 20 ); //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+            // phpcs:disable
+            $incoming_phone_numbers = $twilio->incomingPhoneNumbers->read( [], 20 );
+            // phpcs:enable
 
             // Iterate over results
             if ( ! empty( $incoming_phone_numbers ) ) {
                 foreach ( $incoming_phone_numbers as $number ) {
 
                     // Capture number details
-                    if ( isset( $number->sid ) && isset( $number->phoneNumber ) && isset( $number->friendlyName ) ) { //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+                    // phpcs:disable
+                    if ( isset( $number->sid ) && isset( $number->phoneNumber ) && isset( $number->friendlyName ) ) {
                         $phone_numbers[] = [
                             'id'     => $number->sid,
-                            'number' => $number->phoneNumber, //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-                            'name'   => $number->friendlyName //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+                            'number' => $number->phoneNumber,
+                            'name'   => $number->friendlyName
                         ];
                     }
+                    // phpcs:enable
                 }
             }
         } catch ( Exception $e ) {
@@ -113,12 +116,14 @@ class Disciple_Tools_Twilio_API {
                 foreach ( $services as $service ) {
 
                     // Capture service details
-                    if ( isset( $service->sid ) && isset( $service->friendlyName ) ) { //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+                    // phpcs:disable
+                    if ( isset( $service->sid ) && isset( $service->friendlyName ) ) {
                         $msg_services[] = [
                             'id'   => $service->sid,
-                            'name' => $service->friendlyName //phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+                            'name' => $service->friendlyName
                         ];
                     }
+                    // phpcs:enable
                 }
             }
         } catch ( Exception $e ) {
@@ -128,71 +133,58 @@ class Disciple_Tools_Twilio_API {
         return $msg_services;
     }
 
-    public static function send( $user_id, $message ) {
+    public static function send( $user, $message ) {
         if ( ! self::has_credentials() ) {
             return false;
         }
 
         // Ensure required params are present
-        if ( empty( $user_id ) || empty( $message ) ) {
+        if ( empty( $user ) || empty( $message ) ) {
             return false;
         }
 
         try {
 
-            // Fetch associated user's contacts record id
-            $contact_id = self::get_contact_for_user( $user_id );
-            if ( ! empty( $contact_id ) && ! is_wp_error( $contact_id ) ) {
+            // Fetch phone numbers to be used during dispatch
+            $phone_numbers = self::get_user_phone_numbers( $user );
 
-                // Fetch and split contact field option; which has the following format: [post_type]+[field_id]
-                $option_contact_field = self::get_option( self::$option_twilio_contact_field );
-                $post_type            = explode( '+', $option_contact_field )[0];
-                $field_id             = explode( '+', $option_contact_field )[1];
+            // A quick sanity check prior to iteration!
+            if ( ! empty( $phone_numbers ) ) {
 
-                // Fetch contacts post based on identified option post_type
-                $user_contact = DT_Posts::get_post( $post_type, $contact_id, true, false );
-                if ( ! empty( $user_contact ) && ! is_wp_error( $user_contact ) && isset( $user_contact[ $field_id ] ) ) {
+                // Establish Twilio client session
+                $twilio = new Client( self::get_option( self::$option_twilio_sid ), self::get_option( self::$option_twilio_token ) );
 
-                    // As field is expected to be of type communication_channel; then structure to be an array of phone numbers!
-                    if ( is_array( $user_contact[ $field_id ] ) ) {
+                // Fetch messaging service to be used
+                $messaging_service = $twilio->messaging->v1->services( self::get_option( self::$option_twilio_msg_service_id ) )->fetch();
 
-                        // Establish Twilio client session
-                        $twilio = new Client( self::get_option( self::$option_twilio_sid ), self::get_option( self::$option_twilio_token ) );
+                // Determine required dispatch service to be used
+                $current_service = self::get_option( self::$option_twilio_service );
+                switch ( $current_service ) {
+                    case 'whatsapp':
+                        $service = 'whatsapp:';
+                        break;
+                    default:
+                        $service = ''; // Default to SMS
+                        break;
+                }
 
-                        // Fetch messaging service to be used
-                        $messaging_service = $twilio->messaging->v1->services( self::get_option( self::$option_twilio_msg_service_id ) )->fetch();
+                // Iterate over phone numbers
+                foreach ( $phone_numbers as $phone ) {
+                    if ( ! empty( $phone ) ) {
 
-                        // Determine required dispatch service to be used
-                        $service         = '';
-                        $current_service = self::get_option( self::$option_twilio_service );
-                        switch ( $current_service ) {
-                            case 'whatsapp':
-                                $service = 'whatsapp:';
-                                break;
-                            default:
-                                $service = ''; // Default to SMS
-                                break;
-                        }
-
-                        // Iterate phone numbers
-                        foreach ( $user_contact[ $field_id ] as $phone ) {
-                            if ( ! empty( $phone['value'] ) ) {
-
-                                // Dispatch message...!
-                                $message = $twilio->messages->create(
-                                    $service . $phone['value'],
-                                    [
-                                        'body'                => $message,
-                                        'messagingServiceSid' => $messaging_service->sid
-                                    ]
-                                );
-                            }
-                        }
-
-                        // Return true if this point has been reached
-                        return true;
+                        // Dispatch message...!
+                        $message = $twilio->messages->create(
+                            $service . $phone,
+                            [
+                                'body'                => $message,
+                                'messagingServiceSid' => $messaging_service->sid
+                            ]
+                        );
                     }
                 }
+
+                // Return true if this point has been reached
+                return true;
             }
         } catch ( Exception $e ) {
             return new WP_Error( __FUNCTION__, $e->getMessage(), [ 'status' => $e->getCode() ] );
@@ -201,33 +193,27 @@ class Disciple_Tools_Twilio_API {
         return false;
     }
 
-    private static function get_contact_for_user( $user_id ) {
-        $contact_id = get_user_option( "corresponds_to_contact", $user_id );
+    public static function get_user_phone_numbers( $user ): array {
+        $field = [];
+        switch ( Disciple_Tools_Magic_Links_API::determine_assigned_user_type( $user ) ) {
+            case Disciple_Tools_Magic_Links_API::$assigned_user_type_id_users:
+            case Disciple_Tools_Magic_Links_API::$assigned_user_type_id_contacts:
 
-        if ( ! empty( $contact_id ) && get_post( $contact_id ) ) {
-            return (int) $contact_id;
-        }
-        $args     = [
-            'post_type'  => 'contacts',
-            'relation'   => 'AND',
-            'meta_query' => [
-                [
-                    'key'   => "corresponds_to_user",
-                    "value" => $user_id
-                ],
-                [
-                    'key'   => "type",
-                    "value" => "user"
-                ],
-            ],
-        ];
-        $contacts = new WP_Query( $args );
-        if ( isset( $contacts->post->ID ) ) {
-            update_user_option( $user_id, "corresponds_to_contact", $contacts->post->ID );
+                $user_contact = DT_Posts::get_post( 'contacts', Disciple_Tools_Magic_Links_API::get_contact_id_by_user_id( $user->dt_id ), true, false );
+                if ( ! empty( $user_contact ) && ! is_wp_error( $user_contact ) && isset( $user_contact['contact_phone'] ) ) {
+                    foreach ( $user_contact['contact_phone'] as $phone ) {
+                        if ( ! empty( $phone['value'] ) ) {
+                            $field[] = $phone['value'];
+                        }
+                    }
+                }
+                break;
 
-            return (int) $contacts->post->ID;
-        } else {
-            return null;
+            case Disciple_Tools_Magic_Links_API::$assigned_user_type_id_groups:
+                // TODO
+                break;
         }
+
+        return $field;
     }
 }
