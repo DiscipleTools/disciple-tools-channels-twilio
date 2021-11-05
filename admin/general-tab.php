@@ -60,7 +60,7 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                     <div id="postbox-container-1" class="postbox-container">
                         <!-- Right Column -->
 
-                        <?php /* $this->right_column() */ ?>
+                        <?php $this->right_column() ?>
 
                         <!-- End Right Column -->
                     </div><!-- postbox-container 1 -->
@@ -97,23 +97,24 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
     public function right_column() {
         ?>
         <!-- Box -->
-        <table class="widefat striped">
+        <table style="display: none;" id="twilio_right_docs_section" class="widefat striped">
             <thead>
             <tr>
-                <th>Information</th>
+                <th id="twilio_right_docs_title"></th>
             </tr>
             </thead>
             <tbody>
             <tr>
-                <td>
-                    Content
-                </td>
+                <td id="twilio_right_docs_content"></td>
             </tr>
             </tbody>
         </table>
         <br>
         <!-- End Box -->
         <?php
+
+        // Include helper documentation
+        include 'general-tab-docs.php';
     }
 
     private function main_column_management() {
@@ -128,7 +129,10 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                 </td>
             </tr>
             <tr>
-                <td style="vertical-align: middle;">SID</td>
+                <td style="vertical-align: middle;">Account SID [<a href="#" class="twilio-docs"
+                                                            data-title="twilio_right_docs_title_sid"
+                                                            data-content="twilio_right_docs_content_sid">&#63;</a>]
+                </td>
                 <td>
                     <?php $sid = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_sid ); ?>
                     <input style="min-width: 100%;" type="password" id="twilio_main_col_manage_sid"
@@ -138,7 +142,10 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                 </td>
             </tr>
             <tr>
-                <td style="vertical-align: middle;">Token</td>
+                <td style="vertical-align: middle;">Auth Token [<a href="#" class="twilio-docs"
+                                                              data-title="twilio_right_docs_title_token"
+                                                              data-content="twilio_right_docs_content_token">&#63;</a>]
+                </td>
                 <td>
                     <?php $token = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_token ); ?>
                     <input style="min-width: 100%;" type="password" id="twilio_main_col_manage_token"
@@ -148,7 +155,10 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                 </td>
             </tr>
             <tr>
-                <td style="vertical-align: middle;">Service</td>
+                <td style="vertical-align: middle;">Service Type [<a href="#" class="twilio-docs"
+                                                                data-title="twilio_right_docs_title_service"
+                                                                data-content="twilio_right_docs_content_service">&#63;</a>]
+                </td>
                 <td>
                     <select style="min-width: 100%;" id="twilio_main_col_manage_service">
                         <?php
@@ -163,7 +173,10 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                 </td>
             </tr>
             <tr>
-                <td style="vertical-align: middle;">Messaging Service</td>
+                <td style="vertical-align: middle;">Messaging Service [<a href="#" class="twilio-docs"
+                                                                          data-title="twilio_right_docs_title_msg_service"
+                                                                          data-content="twilio_right_docs_content_msg_service">&#63;</a>]
+                </td>
                 <td>
                     <select style="min-width: 100%;" id="twilio_main_col_manage_msg_service">
                         <option disabled selected value>-- select twilio messaging service --</option>
