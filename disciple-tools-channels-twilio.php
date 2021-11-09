@@ -89,12 +89,6 @@ class Disciple_Tools_Channels_Twilio {
     private function __construct() {
         $is_rest = dt_is_rest();
         /**
-         * @todo Decide if you want to create a new post type
-         * To remove: delete the line below and remove the folder named /post-type
-         */
-        require_once( 'post-type/loader.php' ); // add starter post type extension to Disciple Tools system
-
-        /**
          * @todo Decide if you want to add a custom admin page in the admin area
          * To remove: delete the 3 lines below and remove the folder named /admin
          */

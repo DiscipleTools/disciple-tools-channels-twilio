@@ -1,5 +1,9 @@
 jQuery(function ($) {
 
+  $(document).on('click', '.twilio-docs', function (evt) {
+    handle_docs_request($(evt.currentTarget).data('title'), $(evt.currentTarget).data('content'));
+  });
+
   $(document).on('click', '#twilio_main_col_manage_sid_show', function () {
     show_secrets($('#twilio_main_col_manage_sid'), $('#twilio_main_col_manage_sid_show'));
   });
@@ -11,6 +15,15 @@ jQuery(function ($) {
   $(document).on('click', '#twilio_main_col_manage_update', function () {
     update_settings();
   });
+
+  function handle_docs_request(title_div, content_div) {
+    $('#twilio_right_docs_section').fadeOut('fast', function () {
+      $('#twilio_right_docs_title').html($('#' + title_div).html());
+      $('#twilio_right_docs_content').html($('#' + content_div).html());
+
+      $('#twilio_right_docs_section').fadeIn('fast');
+    });
+  }
 
   function show_secrets(input_ele, show_ele) {
     if (show_ele.is(':checked')) {
