@@ -194,24 +194,25 @@ class Disciple_Tools_Twilio_API {
     }
 
     public static function get_user_phone_numbers( $user ): array {
-        $field = [];
+        $field        = [];
+        $user_contact = null;
         switch ( Disciple_Tools_Magic_Links_API::determine_assigned_user_type( $user ) ) {
             case Disciple_Tools_Magic_Links_API::$assigned_user_type_id_users:
-            case Disciple_Tools_Magic_Links_API::$assigned_user_type_id_contacts:
-
                 $user_contact = DT_Posts::get_post( 'contacts', Disciple_Tools_Magic_Links_API::get_contact_id_by_user_id( $user->dt_id ), true, false );
-                if ( ! empty( $user_contact ) && ! is_wp_error( $user_contact ) && isset( $user_contact['contact_phone'] ) ) {
-                    foreach ( $user_contact['contact_phone'] as $phone ) {
-                        if ( ! empty( $phone['value'] ) ) {
-                            $field[] = $phone['value'];
-                        }
-                    }
-                }
                 break;
 
-            case Disciple_Tools_Magic_Links_API::$assigned_user_type_id_groups:
-                // TODO
+            case Disciple_Tools_Magic_Links_API::$assigned_user_type_id_contacts:
+                $user_contact = DT_Posts::get_post( 'contacts', $user->dt_id, true, false );
                 break;
+        }
+
+        // Assuming we have a valid user contact record hit, proceed with extraction of phone numbers!
+        if ( ! empty( $user_contact ) && ! is_wp_error( $user_contact ) && isset( $user_contact['contact_phone'] ) ) {
+            foreach ( $user_contact['contact_phone'] as $phone ) {
+                if ( ! empty( $phone['value'] ) ) {
+                    $field[] = $phone['value'];
+                }
+            }
         }
 
         return $field;
