@@ -196,12 +196,12 @@ class Disciple_Tools_Twilio_API {
     public static function get_user_phone_numbers( $user ): array {
         $field        = [];
         $user_contact = null;
-        switch ( Disciple_Tools_Magic_Links_API::determine_assigned_user_type( $user ) ) {
-            case Disciple_Tools_Magic_Links_API::$assigned_user_type_id_users:
-                $user_contact = DT_Posts::get_post( 'contacts', Disciple_Tools_Magic_Links_API::get_contact_id_by_user_id( $user->dt_id ), true, false );
+        switch ( Disciple_Tools_Bulk_Magic_Link_Sender_API::determine_assigned_user_type( $user ) ) {
+            case Disciple_Tools_Bulk_Magic_Link_Sender_API::$assigned_user_type_id_users:
+                $user_contact = DT_Posts::get_post( 'contacts', Disciple_Tools_Bulk_Magic_Link_Sender_API::get_contact_id_by_user_id( $user->dt_id ), true, false );
                 break;
 
-            case Disciple_Tools_Magic_Links_API::$assigned_user_type_id_contacts:
+            case Disciple_Tools_Bulk_Magic_Link_Sender_API::$assigned_user_type_id_contacts:
                 $user_contact = DT_Posts::get_post( 'contacts', $user->dt_id, true, false );
                 break;
         }
