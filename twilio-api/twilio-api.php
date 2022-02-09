@@ -173,7 +173,7 @@ class Disciple_Tools_Twilio_API {
                     if ( ! empty( $phone ) ) {
 
                         // Dispatch message...!
-                        $message = $twilio->messages->create(
+                        $message_result = $twilio->messages->create(
                             $service . $phone,
                             [
                                 'body'                => $message,
