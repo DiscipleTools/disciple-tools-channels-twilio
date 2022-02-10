@@ -133,7 +133,7 @@ class Disciple_Tools_Twilio_API {
         return $msg_services;
     }
 
-    public static function send( $user, $message ) {
+    public static function send( $user, $message, $args = [] ) {
         if ( ! self::has_credentials() ) {
             return false;
         }
@@ -158,7 +158,12 @@ class Disciple_Tools_Twilio_API {
                 $messaging_service = $twilio->messaging->v1->services( self::get_option( self::$option_twilio_msg_service_id ) )->fetch();
 
                 // Determine required dispatch service to be used
-                $current_service = self::get_option( self::$option_twilio_service );
+                if ( ! empty( $args ) && isset( $args['service'] ) ) {
+                    $current_service = $args['service'];
+                } else {
+                    $current_service = self::get_option( self::$option_twilio_service );
+                }
+                // Reformat service syntax
                 switch ( $current_service ) {
                     case 'whatsapp':
                         $service = 'whatsapp:';
