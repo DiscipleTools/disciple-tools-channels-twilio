@@ -133,7 +133,7 @@ class Disciple_Tools_Twilio_API {
         return $msg_services;
     }
 
-    public static function send( $user, $message ) {
+    public static function send( $user, $message, $args = [] ) {
         if ( ! self::has_credentials() ) {
             return false;
         }
@@ -158,7 +158,12 @@ class Disciple_Tools_Twilio_API {
                 $messaging_service = $twilio->messaging->v1->services( self::get_option( self::$option_twilio_msg_service_id ) )->fetch();
 
                 // Determine required dispatch service to be used
-                $current_service = self::get_option( self::$option_twilio_service );
+                if ( ! empty( $args ) && isset( $args['service'] ) ) {
+                    $current_service = $args['service'];
+                } else {
+                    $current_service = self::get_option( self::$option_twilio_service );
+                }
+                // Reformat service syntax
                 switch ( $current_service ) {
                     case 'whatsapp':
                         $service = 'whatsapp:';
@@ -173,7 +178,7 @@ class Disciple_Tools_Twilio_API {
                     if ( ! empty( $phone ) ) {
 
                         // Dispatch message...!
-                        $message = $twilio->messages->create(
+                        $message_result = $twilio->messages->create(
                             $service . $phone,
                             [
                                 'body'                => $message,
@@ -196,12 +201,12 @@ class Disciple_Tools_Twilio_API {
     public static function get_user_phone_numbers( $user ): array {
         $field        = [];
         $user_contact = null;
-        switch ( Disciple_Tools_Bulk_Magic_Link_Sender_API::determine_assigned_user_type( $user ) ) {
-            case Disciple_Tools_Bulk_Magic_Link_Sender_API::$assigned_user_type_id_users:
-                $user_contact = DT_Posts::get_post( 'contacts', Disciple_Tools_Bulk_Magic_Link_Sender_API::get_contact_id_by_user_id( $user->dt_id ), true, false );
+        switch ( self::determine_assigned_user_type( $user ) ) {
+            case 'users':
+                $user_contact = DT_Posts::get_post( 'contacts', self::get_contact_id_by_user_id( $user->dt_id ), true, false );
                 break;
 
-            case Disciple_Tools_Bulk_Magic_Link_Sender_API::$assigned_user_type_id_contacts:
+            case 'contacts':
                 $user_contact = DT_Posts::get_post( 'contacts', $user->dt_id, true, false );
                 break;
         }
@@ -216,5 +221,48 @@ class Disciple_Tools_Twilio_API {
         }
 
         return $field;
+    }
+
+    private static function determine_assigned_user_type( $user ): string {
+        if ( in_array( strtolower( trim( $user->type ) ), [ 'user', 'member', 'contact' ] ) ) {
+            switch ( strtolower( trim( $user->sys_type ) ) ) {
+                case 'wp_user':
+                    return 'users';
+                case 'post':
+                    return 'contacts';
+            }
+        }
+
+        return '';
+    }
+
+    private static function get_contact_id_by_user_id( $user_id ): ?int {
+        $contact_id = get_user_option( "corresponds_to_contact", $user_id );
+
+        if ( ! empty( $contact_id ) && get_post( $contact_id ) ) {
+            return (int) $contact_id;
+        }
+        $args     = [
+            'post_type'  => 'contacts',
+            'relation'   => 'AND',
+            'meta_query' => [
+                [
+                    'key'   => "corresponds_to_user",
+                    "value" => $user_id
+                ],
+                [
+                    'key'   => "type",
+                    "value" => "user"
+                ],
+            ],
+        ];
+        $contacts = new WP_Query( $args );
+        if ( isset( $contacts->post->ID ) ) {
+            update_user_option( $user_id, "corresponds_to_contact", $contacts->post->ID );
+
+            return $contacts->post->ID;
+        } else {
+            return null;
+        }
     }
 }

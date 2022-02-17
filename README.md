@@ -18,6 +18,38 @@ Disciple Tools - Channels - Twilio plugin; captures settings enabling communicat
 
 - Your weekly shopping...! ;)
 
+#### Direct Usage
+
+The Disciple Tools - Channels - Twilio plugin can be decoupled, so as to work independently of the Disciple Tools - Bulk Magic link Sender plugin; in order to send messages directly.
+
+In order to make use of this functionality; simply call the following action:
+
+```php
+do_action('dt_twilio_send', 1, 'wp_user', $msg );
+```
+
+Alternatively, the send function can be called directly, if a handle to the boolean result is also required:
+
+```php
+if ( dt_twilio_configured() ) {
+    $bool_result = dt_twilio_direct_send( 1, 'wp_user', $msg, [ 'service' => 'sms' ] );
+}
+```
+
+- __id:__ Assigned WP user id or post id, depending on type value.
+- __type:__ System type; which must be one of the following:
+  - wp_user
+  - post
+- __msg:__ Actual message to be sent; which must adhere to the pre-defined Twilio message template shape. For example:
+  ```text
+  Hi, Please update records -> {{link}} -> Link will expire on {{time}}
+  ```
+  - {{...}} placeholders to be substituted with actual values.
+- __args:__ Ability to specify option overrides during sending. Currently, the following overrides are supported:
+  - _service:_ Specify which of the following twilio service types are to be adopted:
+    - sms
+    - whatsapp
+
 ## Requirements
 
 - Disciple Tools Theme installed on a Wordpress Server
