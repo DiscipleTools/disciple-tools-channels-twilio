@@ -23,7 +23,7 @@ jobs:
       - name: Build project
         run: |
           mkdir disciple-tools-channels-twilio
-          cp -r disciple-tools-channels-twilio.php admin twilio-api spinner.svg version-control.json LICENSE SECURITY.md disciple-tools-channels-twilio/
+          cp -r disciple-tools-channels-twilio.php admin twilio-api spinner.svg version-control.json LICENSE SECURITY.md vendor disciple-tools-channels-twilio/
           zip -r disciple-tools-channels-twilio.zip disciple-tools-channels-twilio
       - name: Create Release
         id: create_release
