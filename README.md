@@ -20,7 +20,7 @@ Disciple Tools - Channels - Twilio plugin; captures settings enabling communicat
 
 #### Direct Usage
 
-The Disciple Tools - Channels - Twilio plugin can be decoupled, so as to work independently of the Disciple Tools - Bulk Magic link Sender plugin; in order to send messages directly.
+The Disciple Tools - Channels - Twilio plugin can be decoupled, so as to work independently of the Disciple Tools - Magic Links plugin; in order to send messages directly.
 
 In order to make use of this functionality; simply call the following action:
 
