@@ -60,3 +60,66 @@ function dt_twilio_direct_send( $id, $type, $msg, $args = [] ): bool {
 function dt_twilio_configured(): bool {
     return Disciple_Tools_Twilio_API::has_credentials() && Disciple_Tools_Twilio_API::has_option( Disciple_Tools_Twilio_API::$option_twilio_msg_service_id );
 }
+
+/**
+ * Integrate with D.T. Notification Channel Framework.
+ */
+
+add_filter( 'dt_get_site_notification_options', 'dt_get_site_notification_options', 10, 1 );
+function dt_get_site_notification_options( $notifications ) {
+
+    $channel_key_sms = 'sms';
+    $channel_key_whatsapp = 'whatsapp';
+
+    // Ensure required sections are present.
+    if ( !isset( $notifications['channels'] ) ) {
+        $notifications['channels'] = [];
+    }
+    if ( !isset( $notifications['types'] ) ) {
+        $notifications['types'] = [];
+    }
+
+    // Create dummy data.
+    $notifications['channels'][$channel_key_sms] = [
+        'label' => __( 'SMS', 'disciple_tools' )
+    ];
+    $notifications['channels'][$channel_key_whatsapp] = [
+        'label' => __( 'WhatsApp', 'disciple_tools' )
+    ];
+
+    // As well as creating new types; append to existing ones.
+    foreach ( $notifications['types'] as $type => $type_settings ) {
+
+        // Only insert, if not already set and default to false.
+        if ( !isset( $notifications['types'][$type][$channel_key_sms] ) ) {
+            $notifications['types'][$type][$channel_key_sms] = false;
+        }
+        if ( !isset( $notifications['types'][$type][$channel_key_whatsapp] ) ) {
+            $notifications['types'][$type][$channel_key_whatsapp] = false;
+        }
+    }
+
+    return $notifications;
+}
+
+add_filter( 'dt_communication_channels', 'dt_communication_channels', 10, 1 );
+function dt_communication_channels( $channels ) {
+    if ( empty( $channels ) ) {
+        $channels = [];
+    }
+    $channels[] = 'sms';
+    $channels[] = 'whatsapp';
+
+    return $channels;
+}
+
+add_action( 'dt_communication_channels_notification', 'dt_communication_channels_notification', 10, 4 );
+function dt_communication_channels_notification( $channel, $user_id, $notification, $args = [] ): bool {
+    if ( in_array( $channel, [ 'sms', 'whatsapp' ] ) && isset( $user_id, $notification, $notification['notification_note'] ) ){
+        do_action( 'dt_twilio_send', $user_id, 'wp_user', $notification['notification_note'], [ 'service' => $channel ] );
+
+        return true;
+    }
+
+    return false;
+}
