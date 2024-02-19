@@ -69,7 +69,7 @@ add_filter( 'dt_get_site_notification_options', 'dt_get_site_notification_option
 function dt_get_site_notification_options( $notifications ) {
 
     $channel_key_sms = 'sms';
-    $channel_key_whatsapp = 'whatsapp';
+    // $channel_key_whatsapp = 'whatsapp';
 
     // Ensure required sections are present.
     if ( !isset( $notifications['channels'] ) ) {
@@ -83,9 +83,9 @@ function dt_get_site_notification_options( $notifications ) {
     $notifications['channels'][$channel_key_sms] = [
         'label' => __( 'SMS', 'disciple_tools' )
     ];
-    $notifications['channels'][$channel_key_whatsapp] = [
+    /*$notifications['channels'][$channel_key_whatsapp] = [
         'label' => __( 'WhatsApp', 'disciple_tools' )
-    ];
+    ];*/
 
     // As well as creating new types; append to existing ones.
     foreach ( $notifications['types'] as $type => $type_settings ) {
@@ -94,9 +94,9 @@ function dt_get_site_notification_options( $notifications ) {
         if ( !isset( $notifications['types'][$type][$channel_key_sms] ) ) {
             $notifications['types'][$type][$channel_key_sms] = false;
         }
-        if ( !isset( $notifications['types'][$type][$channel_key_whatsapp] ) ) {
+        /*if ( !isset( $notifications['types'][$type][$channel_key_whatsapp] ) ) {
             $notifications['types'][$type][$channel_key_whatsapp] = false;
-        }
+        }*/
     }
 
     return $notifications;
@@ -108,7 +108,7 @@ function dt_communication_channels( $channels ) {
         $channels = [];
     }
     $channels[] = 'sms';
-    $channels[] = 'whatsapp';
+    // $channels[] = 'whatsapp';
 
     return $channels;
 }
