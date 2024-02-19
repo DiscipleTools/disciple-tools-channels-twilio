@@ -115,8 +115,8 @@ function dt_communication_channels( $channels ) {
 
 add_action( 'dt_communication_channels_notification', 'dt_communication_channels_notification', 10, 4 );
 function dt_communication_channels_notification( $channel, $user_id, $notification, $args = [] ): bool {
-    if ( in_array( $channel, [ 'sms', 'whatsapp' ] ) && isset( $user_id, $notification, $notification['notification_note'] ) ){
-        do_action( 'dt_twilio_send', $user_id, 'wp_user', $notification['notification_note_plain'] ?? $notification['notification_note'], [ 'service' => $channel ] );
+    if ( in_array( $channel, [ 'sms', 'whatsapp' ] ) && isset( $user_id, $notification ) ){
+        do_action( 'dt_twilio_send', $user_id, 'wp_user', Disciple_Tools_Notifications::get_notification_message_html( $notification, false ), [ 'service' => $channel ] );
 
         return true;
     }
