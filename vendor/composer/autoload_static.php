@@ -11,9 +11,9 @@ class ComposerStaticInit97144f5f0943ba8335b2367955131fbb
         array (
             'Twilio\\' => 7,
         ),
-        'D' => 
+        'P' => 
         array (
-            'Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\' => 55,
+            'PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\' => 57,
         ),
     );
 
@@ -22,7 +22,7 @@ class ComposerStaticInit97144f5f0943ba8335b2367955131fbb
         array (
             0 => __DIR__ . '/..' . '/twilio/sdk/src/Twilio',
         ),
-        'Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\' => 
+        'PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\' => 
         array (
             0 => __DIR__ . '/..' . '/dealerdirect/phpcodesniffer-composer-installer/src',
         ),
