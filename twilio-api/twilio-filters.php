@@ -152,7 +152,8 @@ function send_notification_on_channels( $user_id, $notification, $notification_t
 
         // Process sms channels.
         if ( isset( $user_meta[$sms_channel_notification_key] ) && ( boolval( $user_meta[$sms_channel_notification_key][0] ) === true ) ){
-            do_action( 'dt_twilio_send', $user_id, 'wp_user', Disciple_Tools_Notifications::get_notification_message_html( $notification, false ), [ 'service' => 'sms' ] );
+            $message = Disciple_Tools_Notifications::get_notification_message_html( $notification, false );
+            dt_twilio_direct_send( $user_id, 'wp_user', $message, [ 'service' => 'sms' ] );
         }
 
         // Process whatsapp channels.
