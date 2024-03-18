@@ -201,9 +201,34 @@ class Disciple_Tools_Twilio_API {
     public static function get_user_phone_numbers( $user ): array {
         $field        = [];
         $user_contact = null;
+
         switch ( self::determine_assigned_user_type( $user ) ) {
             case 'users':
-                $user_contact = DT_Posts::get_post( 'contacts', self::get_contact_id_by_user_id( $user->dt_id ), true, false );
+
+                // Attempt to fetch phone numbers in a specific order.
+                $wp_user = get_user_by( 'id', $user->dt_id );
+                if ( !empty( $wp_user ) ) {
+
+                    // Compares the site settings in the config area with the fields available in the user meta table.
+                    $dt_user_fields = dt_build_user_fields_display( get_user_meta( $wp_user->ID ) );
+
+                    // Check for numbers in specific order.
+                    foreach ( $dt_user_fields as $dt_field ) {
+                        if ( empty( $field ) ) {
+                            if ( $dt_field['key'] === 'dt_user_personal_phone' && !empty( $dt_field['value'] ) ) {
+                                $field[] = $dt_field['value'];
+
+                            } elseif ( $dt_field['key'] === 'dt_user_work_phone' && !empty( $dt_field['value'] ) ) {
+                                $field[] = $dt_field['value'];
+                            }
+                        }
+                    }
+                }
+
+                // Check contact record, if no phone numbers found at the user level.
+                if ( empty( $field ) ) {
+                    $user_contact = DT_Posts::get_post( 'contacts', self::get_contact_id_by_user_id( $user->dt_id ), true, false );
+                }
                 break;
 
             case 'contacts':
@@ -212,9 +237,11 @@ class Disciple_Tools_Twilio_API {
         }
 
         // Assuming we have a valid user contact record hit, proceed with extraction of phone numbers!
-        if ( ! empty( $user_contact ) && ! is_wp_error( $user_contact ) && isset( $user_contact['contact_phone'] ) ) {
+        if ( empty( $field ) && ! empty( $user_contact ) && ! is_wp_error( $user_contact ) && isset( $user_contact['contact_phone'] ) ) {
             foreach ( $user_contact['contact_phone'] as $phone ) {
-                if ( ! empty( $phone['value'] ) ) {
+
+                // To avoid spamming all associated numbers, only proceed with the first number encountered.
+                if ( empty( $field ) && ! empty( $phone['value'] ) ) {
                     $field[] = $phone['value'];
                 }
             }
