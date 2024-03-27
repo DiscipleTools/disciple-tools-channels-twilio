@@ -111,6 +111,7 @@ class Disciple_Tools_Channels_Twilio {
         require_once( 'vendor/autoload.php' );
         require_once( 'twilio-api/twilio-api.php' );
         require_once( 'twilio-api/twilio-filters.php' );
+        require_once( 'twilio-api/rest-api.php' );
 
     }
 
