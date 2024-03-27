@@ -18,6 +18,16 @@ class Disciple_Tools_Twilio_Rest
                 },
             ]
         );
+
+        register_rest_route(
+            $namespace, '/webhook', [
+                'methods'  => 'POST',
+                'callback' => [ $this, 'webhook' ],
+                'permission_callback' => function( WP_REST_Request $request ) {
+                    return true;
+                },
+            ]
+        );
     }
 
 
