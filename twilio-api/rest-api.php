@@ -1,6 +1,8 @@
 <?php
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
+use Twilio\Security\RequestValidator;
+
 class Disciple_Tools_Twilio_Rest
 {
     public $permissions = [ 'access_contacts', 'dt_all_access_contacts', 'view_project_metrics' ];
@@ -44,7 +46,18 @@ class Disciple_Tools_Twilio_Rest
 
         $phone_number_location = ( $params['FromCity'] ?? '' ) . ', ' . ( $params['FromState'] ?? '' ) . ', ' . ( $params['FromCountry'] ?? '' ) . ', ' . ( $params['FromZip'] ?? '' );
 
-        //@todo validate
+        //validate https://www.twilio.com/docs/usage/webhooks/webhooks-security
+        $token = get_option( Disciple_Tools_Twilio_API::$option_twilio_token );
+        if ( empty( $token ) ) {
+            return false;
+        }
+        $signature = $headers['X-Twilio-Signature'][0] ?? '';
+        $validator = new RequestValidator( $token );
+        $url = get_site_url() . '/wp-json/dt-public/twilio/v1/webhook';
+        if ( !$validator->validate( $signature, $url, $params ) ){
+            return false;
+        }
+
         if ( class_exists( 'Communication_Handles' ) ) {
 
             $conversations_record = Communication_Handles::create_or_update_conversation_record(
