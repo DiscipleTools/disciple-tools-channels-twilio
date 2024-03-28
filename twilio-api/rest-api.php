@@ -31,7 +31,7 @@ class Disciple_Tools_Twilio_Rest
     }
 
 
-    public function endpoint( WP_REST_Request $request ) {
+    public function webhook( WP_REST_Request $request ) {
         $params = $request->get_params();
         $headers = $request->get_headers();
 
