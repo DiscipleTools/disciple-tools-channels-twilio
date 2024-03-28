@@ -7,7 +7,7 @@ class Disciple_Tools_Twilio_Rest
 
 
     public function add_api_routes() {
-        $namespace = 'twilio/v1';
+        $namespace = 'dt-public/twilio/v1';
 
         register_rest_route(
             $namespace, '/webhook', [
