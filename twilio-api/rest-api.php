@@ -61,4 +61,4 @@ class Disciple_Tools_Twilio_Rest
         return $pass;
     }
 }
-Disciple_Tools_Plugin_Starter_Template_Endpoints::instance();
+Disciple_Tools_Twilio_Rest::instance();
