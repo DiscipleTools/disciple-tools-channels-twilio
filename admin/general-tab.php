@@ -16,7 +16,7 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
             'lodash'
         ], filemtime( dirname( __FILE__ ) . '/js/general-tab.js' ), true );
         wp_localize_script(
-            "dt_channels_twilio_general_script", "dt_channels_twilio", array(
+            'dt_channels_twilio_general_script', 'dt_channels_twilio', array(
                 't_b_c' => []
             )
         );
@@ -197,7 +197,7 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
         <br>
         <span style="float:right;">
             <button type="submit" id="twilio_main_col_manage_update"
-                    class="button float-right"><?php esc_html_e( "Update", 'disciple_tools' ) ?></button>
+                    class="button float-right"><?php esc_html_e( 'Update', 'disciple_tools' ) ?></button>
         </span>
 
         <!-- [Submission Form] -->
