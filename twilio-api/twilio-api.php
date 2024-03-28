@@ -264,7 +264,7 @@ class Disciple_Tools_Twilio_API {
     }
 
     private static function get_contact_id_by_user_id( $user_id ): ?int {
-        $contact_id = get_user_option( "corresponds_to_contact", $user_id );
+        $contact_id = get_user_option( 'corresponds_to_contact', $user_id );
 
         if ( ! empty( $contact_id ) && get_post( $contact_id ) ) {
             return (int) $contact_id;
@@ -274,18 +274,18 @@ class Disciple_Tools_Twilio_API {
             'relation'   => 'AND',
             'meta_query' => [
                 [
-                    'key'   => "corresponds_to_user",
-                    "value" => $user_id
+                    'key'   => 'corresponds_to_user',
+                    'value' => $user_id
                 ],
                 [
-                    'key'   => "type",
-                    "value" => "user"
+                    'key'   => 'type',
+                    'value' => 'user'
                 ],
             ],
         ];
         $contacts = new WP_Query( $args );
         if ( isset( $contacts->post->ID ) ) {
-            update_user_option( $user_id, "corresponds_to_contact", $contacts->post->ID );
+            update_user_option( $user_id, 'corresponds_to_contact', $contacts->post->ID );
 
             return $contacts->post->ID;
         } else {
