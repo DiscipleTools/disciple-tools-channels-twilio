@@ -37,9 +37,6 @@ class Disciple_Tools_Twilio_Rest
         $params = $request->get_params();
         $headers = $request->get_headers();
 
-        dt_write_log( $params );
-        dt_write_log( $headers );
-
         if ( !isset( $params['From'] ) || !isset( $params['To'] ) || !isset( $params['Body'] ) ) {
             return false;
         }
@@ -51,7 +48,7 @@ class Disciple_Tools_Twilio_Rest
         if ( empty( $token ) ) {
             return false;
         }
-        $signature = $headers['X-Twilio-Signature'][0] ?? '';
+        $signature = $headers['x_twilio_signature'][0] ?? '';
         $validator = new RequestValidator( $token );
         $url = get_site_url() . '/wp-json/dt-public/twilio/v1/webhook';
         if ( !$validator->validate( $signature, $url, $params ) ){
