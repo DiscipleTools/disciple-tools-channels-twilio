@@ -38,6 +38,25 @@ class Disciple_Tools_Twilio_Rest
         dt_write_log( $params );
         dt_write_log( $headers );
 
+        if ( !isset( $params['From'] ) || !isset( $params['To'] ) || !isset( $params['Body'] ) ) {
+            return false;
+        }
+
+        $phone_number_location = ( $params['FromCity'] ?? '' ) . ', ' . ( $params['FromState'] ?? '' ) . ', ' . ( $params['FromCountry'] ?? '' ) . ', ' . ( $params['FromZip'] ?? '' );
+
+        //@todo validate
+        if ( class_exists( 'Communication_Handles' ) ) {
+
+            $conversations_record = Communication_Handles::create_or_update_conversation_record(
+                $params['From'],
+                [ 'type' => 'phone' ],
+            );
+            if ( !is_wp_error( $conversations_record ) ){
+                DT_Posts::add_post_comment( 'conversations', $conversations_record['ID'], $phone_number_location, 'twilio', [], false, true );
+                DT_Posts::add_post_comment( 'conversations', $conversations_record['ID'], $params['Body'], 'twilio', [], false, false );
+            }
+        }
+
         return true;
     }
 
