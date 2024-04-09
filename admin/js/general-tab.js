@@ -1,5 +1,12 @@
 jQuery(function ($) {
 
+  $(document).ready(function () {
+    assigned_numbers_load(function () {
+      $('#twilio_main_col_assigned_numbers_sms_select').val( window.dt_admin_shared.escape( window.dt_channels_twilio.assigned_numbers_sms_id ) );
+      $('#twilio_main_col_assigned_numbers_whatsapp_select').val( window.dt_admin_shared.escape( window.dt_channels_twilio.assigned_numbers_whatsapp_id ) );
+    });
+  });
+
   $(document).on('click', '.twilio-docs', function (evt) {
     handle_docs_request($(evt.currentTarget).data('title'), $(evt.currentTarget).data('content'));
   });
@@ -12,8 +19,19 @@ jQuery(function ($) {
     show_secrets($('#twilio_main_col_manage_token'), $('#twilio_main_col_manage_token_show'));
   });
 
-  $(document).on('click', '#twilio_main_col_manage_update', function () {
+  $(document).on('change', '#twilio_main_col_manage_msg_service', function () {
+    assigned_numbers_load(function () {
+      $('#twilio_main_col_assigned_numbers_sms_select').val( window.dt_admin_shared.escape( window.dt_channels_twilio.assigned_numbers_sms_id ) );
+      $('#twilio_main_col_assigned_numbers_whatsapp_select').val( window.dt_admin_shared.escape( window.dt_channels_twilio.assigned_numbers_whatsapp_id ) );
+    });
+  });
+
+  $(document).on('click', '.twilio-main-col-update', function () {
     update_settings();
+  });
+
+  $(document).on('click', '.numbers-nav-tab', function (e) {
+    assigned_numbers_tab_switch( $(e.target).data('number_type') );
   });
 
   function handle_docs_request(title_div, content_div) {
@@ -33,6 +51,119 @@ jQuery(function ($) {
     }
   }
 
+  function assigned_numbers_load( callback = null ) {
+    const tab_content = $('#twilio_main_col_assigned_numbers_tab_content');
+    const tab_content_spinner = $('#twilio_main_col_assigned_numbers_tab_content_spinner');
+
+    $(tab_content).children().hide();
+    $(tab_content_spinner).fadeIn('fast');
+
+    // Proceed with requesting list of assigned numbers, by selected messaging service.
+    const list_type = 'messaging';
+    $.ajax({
+      url: window.dt_channels_twilio.dt_endpoint_list_phone_numbers,
+      method: 'POST',
+      data: {
+        'type': list_type,
+        'msg_service_id': $('#twilio_main_col_manage_msg_service').val()
+      },
+      beforeSend: (xhr) => {
+        xhr.setRequestHeader("X-WP-Nonce", window.dt_admin_scripts.nonce);
+      },
+      success: function (data) {
+
+        // Process sms numbers and reset accordingly.
+        const tab_content_sms = $('#twilio_main_col_assigned_numbers_tab_content_sms');
+        const tab_content_sms_select = $('#twilio_main_col_assigned_numbers_sms_select');
+        $(tab_content_sms_select).empty().append($('<option>', {
+          'value': '',
+          'text': '-- select default sms phone number --',
+          'selected': true,
+          'disabled': true
+        }));
+
+        if (data[list_type] && data[list_type]?.sms.length > 0) {
+          data[list_type]['sms'].forEach(function (number) {
+            if (number['id'] && number['name']) {
+              $(tab_content_sms_select).append($('<option>', {
+                'value': window.dt_admin_shared.escape( number['id'] ),
+                'text': window.dt_admin_shared.escape( number['name'] )
+              }));
+            }
+          });
+        }
+
+        // Process whatsapp numbers and reset accordingly.
+        const tab_content_whatsapp = $('#twilio_main_col_assigned_numbers_tab_content_whatsapp');
+        const tab_content_whatsapp_select = $('#twilio_main_col_assigned_numbers_whatsapp_select');
+        $(tab_content_whatsapp_select).empty().append($('<option>', {
+          'value': '',
+          'text': '-- select default whatsapp phone number --',
+          'selected': true,
+          'disabled': true
+        }));
+
+        if (data[list_type] && data[list_type]?.whatsapp.length > 0) {
+          data[list_type]['whatsapp'].forEach(function (number) {
+            if (number['id'] && number['name']) {
+              $(tab_content_whatsapp_select).append($('<option>', {
+                'value': window.dt_admin_shared.escape( number['id'] ),
+                'text': window.dt_admin_shared.escape( number['name'] )
+              }));
+            }
+          });
+        }
+
+        // Display updated numbers, accordingly by currently active tab.
+        $(tab_content_spinner).fadeOut('slow', function() {
+          const active_tab = $('.numbers-nav-tab.nav-tab-active');
+
+          // Trigger callback just before re-display.
+          if ( callback ) { callback(); }
+
+          // Display relevant tab content.
+          switch ( $(active_tab).data('number_type') ) {
+            case 'whatsapp':
+              $(tab_content_whatsapp).fadeIn('fast');
+              break;
+            case 'sms':
+              $(tab_content_sms).fadeIn('fast');
+              break;
+          }
+        });
+      },
+      error: function (data) {
+        console.log(data);
+        $(tab_content_spinner).fadeOut('slow', function () {
+          $(tab_content).children().hide();
+          $('#twilio_main_col_assigned_numbers_tab_content_msg').text('-- unable to locate any phone numbers --').fadeIn('fast');
+        });
+      }
+    });
+  }
+
+  function assigned_numbers_tab_switch( number_type ) {
+    const tab_content = $('#twilio_main_col_assigned_numbers_tab_content');
+    const tab_content_sms = $('#twilio_main_col_assigned_numbers_tab_content_sms');
+    const tab_content_whatsapp = $('#twilio_main_col_assigned_numbers_tab_content_whatsapp');
+
+    // Select specified tab.
+    $('.numbers-nav-tab').removeClass('nav-tab-active');
+    $('#twilio_main_col_assigned_numbers_'+ number_type +'_tab').addClass('nav-tab-active');
+
+    // Select corresponding tab content.
+    $(tab_content).children().hide();
+
+    switch ( number_type ) {
+      case 'whatsapp':
+        $(tab_content_whatsapp).fadeIn('fast');
+        break;
+      case 'sms':
+        $(tab_content_sms).fadeIn('fast');
+        break;
+    }
+  }
+
   function update_settings() {
 
     // Fetch values
@@ -41,6 +172,8 @@ jQuery(function ($) {
     let token = $('#twilio_main_col_manage_token').val();
     let service = $('#twilio_main_col_manage_service').val();
     let msg_service_id = $('#twilio_main_col_manage_msg_service').val();
+    let msg_service_assigned_numbers_sms_id = $('#twilio_main_col_assigned_numbers_sms_select').val();
+    let msg_service_assigned_numbers_whatsapp_id = $('#twilio_main_col_assigned_numbers_whatsapp_select').val();
 
     // Update submission form
     $('#twilio_main_col_manage_form_enabled').val(enabled);
@@ -48,6 +181,8 @@ jQuery(function ($) {
     $('#twilio_main_col_manage_form_token').val(token);
     $('#twilio_main_col_manage_form_service').val(service);
     $('#twilio_main_col_manage_form_msg_service_id').val(msg_service_id);
+    $('#twilio_main_col_manage_form_msg_service_assigned_numbers_sms_id').val(msg_service_assigned_numbers_sms_id);
+    $('#twilio_main_col_manage_form_msg_service_assigned_numbers_whatsapp_id').val(msg_service_assigned_numbers_whatsapp_id);
 
     // Post submission form
     $('#twilio_main_col_manage_form').submit();

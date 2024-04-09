@@ -43,12 +43,12 @@
 </div>
 <!-- Auth Token -->
 
-<!-- Service Type -->
+<!-- Default Service Type -->
 <div id="twilio_right_docs_title_service" style="display: none;">
-    Service Type
+    Default Service Type
 </div>
 <div id="twilio_right_docs_content_service" style="display: none;">
-    Service carrier type to be used during message dispatch. The following types are currently supported:
+    Default service carrier type to be used, if none are specified during message dispatches. The following types are currently supported:
     <ul>
         <li>- SMS</li>
         <li>- WhatsApp</li>

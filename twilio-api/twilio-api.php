@@ -20,6 +20,12 @@ class Disciple_Tools_Twilio_API {
     public static $option_twilio_service = 'dt_twilio_service';
     public static $option_twilio_msg_service_id = 'dt_twilio_msg_service_id';
     public static $option_twilio_number_id = 'dt_twilio_number_id';
+    public static $option_twilio_assigned_numbers_sms_id = 'dt_twilio_assigned_numbers_sms_id';
+    public static $option_twilio_assigned_numbers_whatsapp_id = 'dt_twilio_assigned_numbers_whatsapp_id';
+
+    public static function fetch_endpoint_list_phone_numbers_url(): string {
+        return trailingslashit( site_url() ) . 'wp-json/disciple_tools_channels_twilio/v1/list_phone_numbers';
+    }
 
     public static function is_enabled(): bool {
         $enabled = get_option( self::$option_twilio_enabled );
@@ -56,7 +62,7 @@ class Disciple_Tools_Twilio_API {
         ];
     }
 
-    public static function list_phone_numbers(): array {
+    public static function list_incoming_phone_numbers(): array {
         if ( ! self::has_credentials() ) {
             return [];
         }
@@ -94,6 +100,62 @@ class Disciple_Tools_Twilio_API {
         }
 
         return $phone_numbers;
+    }
+
+    public static function list_messaging_services_phone_numbers( $sid ): array {
+        if ( ! self::has_credentials() ) {
+            return [];
+        }
+
+        $phone_numbers_sms = [];
+        $phone_numbers_whatsapp = [];
+
+        try {
+
+            // Establish Twilio client session
+            $twilio = new Client( self::get_option( self::$option_twilio_sid ), self::get_option( self::$option_twilio_token ) );
+
+            // Fetch available incoming phone numbers
+            // phpcs:disable
+            $incoming_phone_numbers = $twilio->messaging->v1->services( $sid )->phoneNumbers->read( 20 );
+            // phpcs:enable
+
+            // Iterate over results
+            if ( ! empty( $incoming_phone_numbers ) ) {
+                foreach ( $incoming_phone_numbers as $number ) {
+
+                    // phpcs:disable
+                    if ( isset( $number->sid, $number->phoneNumber ) ) {
+                        $capture = false;
+
+                        // Capture accordingly, based on service type grouping!
+                        if ( in_array( 'SMS', $number->capabilities ?? [] ) || in_array( 'MMS', $number->capabilities ?? [] ) ) {
+                            $phone_numbers_sms[] = [
+                                'id'     => $number->sid,
+                                'number' => $number->phoneNumber,
+                                'name'   => $number->phoneNumber . ( !empty( $number->countryCode ) ? ' ['. $number->countryCode .']' : '' )
+                            ];
+                        }
+
+                        if ( in_array( 'Voice', $number->capabilities ?? [] ) ) {
+                            $phone_numbers_whatsapp[] = [
+                                'id'     => $number->sid,
+                                'number' => $number->phoneNumber,
+                                'name'   => $number->phoneNumber . ( !empty( $number->countryCode ) ? ' ['. $number->countryCode .']' : '' )
+                            ];
+                        }
+                    }
+                    // phpcs:enable
+                }
+            }
+        } catch ( Exception $e ) {
+            return [];
+        }
+
+        return [
+            'sms' => $phone_numbers_sms,
+            'whatsapp' => $phone_numbers_whatsapp
+        ];
     }
 
     public static function list_messaging_services(): array {
@@ -173,6 +235,32 @@ class Disciple_Tools_Twilio_API {
                         break;
                 }
 
+                // Prepare message options.
+                $msg_opts = [
+                    'body' => $message,
+                    'messagingServiceSid' => $messaging_service->sid
+                ];
+
+                $assigned_numbers_id = self::get_option( ( ( $current_service === 'sms' ) ? self::$option_twilio_assigned_numbers_sms_id : self::$option_twilio_assigned_numbers_whatsapp_id ) );
+                if ( !empty( $assigned_numbers_id ) ) {
+
+                    try {
+
+                        // phpcs:disable
+                        $phone_number = $twilio->messaging->v1->services( $messaging_service->sid )
+                            ->phoneNumbers( $assigned_numbers_id )
+                            ->fetch();
+
+                        if ( !empty( $phone_number->phoneNumber ) ) {
+                            $msg_opts['from'] = $service . $phone_number->phoneNumber;
+                        }
+                        // phpcs:enable
+
+                    } catch ( Exception $e_numbers ) {
+                        dt_write_log( $e_numbers );
+                    }
+                }
+
                 // Iterate over phone numbers
                 foreach ( $phone_numbers as $phone ) {
                     if ( ! empty( $phone ) ) {
@@ -180,10 +268,7 @@ class Disciple_Tools_Twilio_API {
                         // Dispatch message...!
                         $message_result = $twilio->messages->create(
                             $service . $phone,
-                            [
-                                'body'                => $message,
-                                'messagingServiceSid' => $messaging_service->sid
-                            ]
+                            $msg_opts
                         );
                     }
                 }
