@@ -36,6 +36,7 @@ class Disciple_Tools_Twilio_Rest
 
     public function webhook( WP_REST_Request $request ) {
         $params = $request->get_params();
+        $params = dt_recursive_sanitize_array( $params );
         $headers = $request->get_headers();
 
         if ( !isset( $params['From'] ) || !isset( $params['To'] ) || !isset( $params['Body'] ) ) {
@@ -56,28 +57,20 @@ class Disciple_Tools_Twilio_Rest
             return false;
         }
 
+        $type = str_contains( $params['From'], 'whatsapp' ) ? 'whatsapp' : 'phone';
+
         if ( class_exists( 'Communication_Handles' ) ) {
 
             $conversations_record = Communication_Handles::create_or_update_conversation_record(
                 $params['From'],
-                [ 'type' => 'phone' ],
+                [ 'type' => $type ],
             );
             if ( !is_wp_error( $conversations_record ) ){
-                DT_Posts::add_post_comment( 'conversations', $conversations_record['ID'], $phone_number_location, 'twilio', [], false, true );
+                #DT_Posts::add_post_comment( 'conversations', $conversations_record['ID'], $phone_number_location, 'twilio', [], false, true );
                 DT_Posts::add_post_comment( 'conversations', $conversations_record['ID'], $params['Body'], 'twilio', [], false, false );
 
-                $sid = get_option( Disciple_Tools_Twilio_API::$option_twilio_sid );
 
-                $twilio = new Client( $sid, $token );
-
-                $message = $twilio->messages
-                    ->create( $params['From'],
-                        [
-                            'from' => 'whatsapp:+14054496743',
-                            'body' => 'Thank you.'
-                        ]
-                    );
-                dt_write_log( $message->sid );
+                do_action( 'dt_twilio_message_received', $type, $conversations_record['ID'], $params );
             }
         } else {
             //@todo find contact and add message
