@@ -1,6 +1,7 @@
 <?php
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
+use Twilio\Rest\Client;
 use Twilio\Security\RequestValidator;
 
 class Disciple_Tools_Twilio_Rest
@@ -64,7 +65,23 @@ class Disciple_Tools_Twilio_Rest
             if ( !is_wp_error( $conversations_record ) ){
                 DT_Posts::add_post_comment( 'conversations', $conversations_record['ID'], $phone_number_location, 'twilio', [], false, true );
                 DT_Posts::add_post_comment( 'conversations', $conversations_record['ID'], $params['Body'], 'twilio', [], false, false );
+
+                $sid = get_option( Disciple_Tools_Twilio_API::$option_twilio_sid );
+
+                $twilio = new Client( $sid, $token );
+
+                $message = $twilio->messages
+                    ->create( $params['From'],
+                        [
+                            'from' => 'whatsapp:+14054496743',
+                            'body' => 'Thank you.'
+                        ]
+                    );
+                dt_write_log( $message->sid );
             }
+        } else {
+            //@todo find contact and add message
+            return true;
         }
 
         return true;
