@@ -34,6 +34,13 @@ class Disciple_Tools_Twilio_Rest
     }
 
 
+    /**
+     * See https://www.twilio.com/docs/messaging/tutorials/how-to-receive-and-reply/php
+     * See https://www.twilio.com/docs/usage/webhooks/webhooks-security
+     * See parameters: https://www.twilio.com/docs/messaging/guides/webhook-request
+     * @param WP_REST_Request $request
+     * @return bool
+     */
     public function webhook( WP_REST_Request $request ) {
         $params = $request->get_params();
         $params = dt_recursive_sanitize_array( $params );
@@ -70,10 +77,10 @@ class Disciple_Tools_Twilio_Rest
                 DT_Posts::add_post_comment( 'conversations', $conversations_record['ID'], $params['Body'], 'twilio', [], false, false );
 
 
-                do_action( 'dt_twilio_message_received', $type, $conversations_record['ID'], $params );
+                do_action( 'dt_twilio_message_received', $type, $params, $conversations_record['ID'] );
             }
         } else {
-            //@todo find contact and add message
+            do_action( 'dt_twilio_message_received', $type, $params );
             return true;
         }
 
