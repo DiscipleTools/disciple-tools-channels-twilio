@@ -82,7 +82,7 @@ jQuery(function ($) {
           'disabled': true
         }));
 
-        if (data[list_type] && data[list_type]?.sms.length > 0) {
+        if (data[list_type] && data[list_type]['sms']) {
           data[list_type]['sms'].forEach(function (number) {
             if (number['id'] && number['name']) {
               $(tab_content_sms_select).append($('<option>', {
@@ -103,7 +103,7 @@ jQuery(function ($) {
           'disabled': true
         }));
 
-        if (data[list_type] && data[list_type]?.whatsapp.length > 0) {
+        if (data[list_type] && data[list_type]['whatsapp']) {
           data[list_type]['whatsapp'].forEach(function (number) {
             if (number['id'] && number['name']) {
               $(tab_content_whatsapp_select).append($('<option>', {

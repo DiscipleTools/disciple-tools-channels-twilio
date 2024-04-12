@@ -92,6 +92,8 @@ class Disciple_Tools_Channels_Twilio_Menu {
             <h2 class="nav-tab-wrapper">
                 <a href="<?php echo esc_attr( $link ) . 'general' ?>"
                    class="nav-tab <?php echo esc_html( ( $tab == 'general' || ! isset( $tab ) ) ? 'nav-tab-active' : '' ); ?>">General</a>
+                <a href="<?php echo esc_attr( $link ) . 'templates' ?>"
+                   class="nav-tab <?php echo esc_html( ( $tab == 'templates' || ! isset( $tab ) ) ? 'nav-tab-active' : '' ); ?>">Templates</a>
             </h2>
 
             <?php
@@ -99,6 +101,11 @@ class Disciple_Tools_Channels_Twilio_Menu {
                 case 'general':
                     require( 'general-tab.php' );
                     $object = new Disciple_Tools_Channels_Twilio_Tab_General();
+                    $object->content();
+                    break;
+                case 'templates':
+                    require( 'templates-tab.php' );
+                    $object = new Disciple_Tools_Channels_Twilio_Tab_Templates();
                     $object->content();
                     break;
                 default:

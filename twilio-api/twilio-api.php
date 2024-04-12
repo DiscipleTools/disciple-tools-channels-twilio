@@ -22,9 +22,22 @@ class Disciple_Tools_Twilio_API {
     public static $option_twilio_number_id = 'dt_twilio_number_id';
     public static $option_twilio_assigned_numbers_sms_id = 'dt_twilio_assigned_numbers_sms_id';
     public static $option_twilio_assigned_numbers_whatsapp_id = 'dt_twilio_assigned_numbers_whatsapp_id';
+    public static $option_twilio_messaging_templates = 'dt_twilio_messaging_templates';
 
     public static function fetch_endpoint_list_phone_numbers_url(): string {
         return trailingslashit( site_url() ) . 'wp-json/disciple_tools_channels_twilio/v1/list_phone_numbers';
+    }
+
+    public static function fetch_endpoint_upload_messaging_template_url(): string {
+        return trailingslashit( site_url() ) . 'wp-json/disciple_tools_channels_twilio/v1/upload_messaging_template';
+    }
+
+    public static function fetch_endpoint_submit_messaging_template_url(): string {
+        return trailingslashit( site_url() ) . 'wp-json/disciple_tools_channels_twilio/v1/submit_messaging_template';
+    }
+
+    public static function fetch_endpoint_reset_messaging_template_url(): string {
+        return trailingslashit( site_url() ) . 'wp-json/disciple_tools_channels_twilio/v1/reset_messaging_template';
     }
 
     public static function is_enabled(): bool {
@@ -41,12 +54,12 @@ class Disciple_Tools_Twilio_API {
         return ! empty( get_option( $option ) );
     }
 
-    public static function get_option( $option ): string {
-        return get_option( $option );
+    public static function get_option( $option, $default_value = null ) {
+        return get_option( $option, $default_value );
     }
 
-    public static function set_option( $option, $value ) {
-        update_option( $option, $value );
+    public static function set_option( $option, $value ): bool {
+        return update_option( $option, $value );
     }
 
     public static function list_services(): array {
@@ -60,6 +73,445 @@ class Disciple_Tools_Twilio_API {
                 'name' => 'WhatsApp'
             ]
         ];
+    }
+
+    public static function list_messaging_templates(): array {
+        $messaging_templates = [
+            'hello_world' => [
+                'id' => 'hello_world',
+                'name' => 'Hello World',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => 'Hello World',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => '-- name --'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => 'Hi {{1}}, \n Hello World!'
+                        ]
+                    ]
+                ]
+            ],
+            'created' => [
+                'id' => 'created',
+                'name' => 'Created',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => 'Created',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => '-- name --'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => '{{1}} was created and assigned to you.'
+                        ]
+                    ]
+                ]
+            ],
+            'assigned_to' => [
+                'id' => 'assigned_to',
+                'name' => 'Assigned To',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => 'Assigned To',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => '-- name --'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => 'You have been assigned: {{1}}.'
+                        ]
+                    ]
+                ]
+            ],
+            'assigned_to_other' => [
+                'id' => 'assigned_to_other',
+                'name' => 'Assigned To Other',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => 'Assigned To Other',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => '-- name1 --',
+                        '2' => '-- name2 --',
+                        '3' => '-- name3 --'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => '{{1}} assigned {{2}} to {{3}}.'
+                        ]
+                    ]
+                ]
+            ],
+            'share' => [
+                'id' => 'share',
+                'name' => 'Share',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => 'Share',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => '-- name1 --',
+                        '2' => '-- name2 --'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => '{{1}} shared {{2}} with you.'
+                        ]
+                    ]
+                ]
+            ],
+            'mention' => [
+                'id' => 'mention',
+                'name' => '@Mentions',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => '@Mentions',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => '-- name1 --',
+                        '2' => '-- name2 --',
+                        '3' => '-- mention --'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => '{{1}} mentioned you on {{2}} saying: {{3}}'
+                        ]
+                    ]
+                ]
+            ],
+            'comment' => [
+                'id' => 'comment',
+                'name' => 'New Comments',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => 'New Comments',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => '-- name1 --',
+                        '2' => '-- name2 --',
+                        '3' => '-- comment --'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => '{{1}} commented on {{2}} saying: {{3}}'
+                        ]
+                    ]
+                ]
+            ],
+            'subassigned' => [
+                'id' => 'subassigned',
+                'name' => 'Sub-Assigned',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => 'Sub-Assigned',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => '-- name1 --',
+                        '2' => '-- name2 --'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => '{{1}} subassigned {{2}} to you.'
+                        ]
+                    ]
+                ]
+            ],
+            'milestone' => [
+                'id' => 'milestone',
+                'name' => 'Contact Milestones and Group Health metrics',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => 'Contact Milestones and Group Health metrics',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => '-- name1 --',
+                        '2' => '-- milestone --',
+                        '3' => '-- name3 --'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => '{{1}} added milestone {{2}} on {{3}}.'
+                        ]
+                    ]
+                ]
+            ],
+            'requires_update' => [
+                'id' => 'requires_update',
+                'name' => 'Requires Update',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => 'Requires Update',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => '-- name1 --',
+                        '2' => '-- name2 --'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => '@{{1}}, an update is requested on {{2}}.'
+                        ]
+                    ]
+                ]
+            ],
+            'contact_info_update' => [
+                'id' => 'contact_info_update',
+                'name' => 'Contact Info Update',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => 'Contact Info Update',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => '-- name1 --',
+                        '2' => '-- name2 --'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => '{{1}} modified contact details on {{2}}.'
+                        ]
+                    ]
+                ]
+            ],
+            'assignment_declined' => [
+                'id' => 'assignment_declined',
+                'name' => 'Assignment Declined',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => 'Assignment Declined',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => '-- name1 --',
+                        '2' => '-- name2 --'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => '{{1}} declined assignment on: {{2}}.'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        return apply_filters( 'dt_twilio_messaging_templates', $messaging_templates );
+    }
+
+    public static function list_messaging_templates_statuses(): array {
+        if ( ! self::has_credentials() ) {
+            return [];
+        }
+
+        $templates = [];
+
+        try {
+
+            // As there does not seem to be a Twilio API for this operation, a raw HTTP GET request shall be constructed.
+            $url = 'https://content.twilio.com/v1/ContentAndApprovals';
+            $options = [
+                'http' => [
+                    'header' => [
+                        'Content-Type: application/json',
+                        'Authorization: Basic ' . base64_encode( self::get_option( self::$option_twilio_sid, '' ) .':'. self::get_option( self::$option_twilio_token, '' ) )
+                    ],
+                    'method' => 'GET',
+                    'content' => ''
+                ]
+            ];
+
+            $context = stream_context_create( $options );
+            $response = file_get_contents( $url, false, $context );
+
+            if ( !empty( $response ) && !is_wp_error( $response ) ) {
+                $content_and_approvals = json_decode( $response, true );
+                if ( ! empty( $content_and_approvals ) ) {
+                    foreach ( $content_and_approvals['contents'] ?? [] as $content ) {
+
+                        // Capture content template details
+                        if ( isset( $content['sid'] ) ) {
+                            $details = [
+                                'id' => $content['sid'],
+                                'name' => $content['friendly_name'] ?? ''
+                            ];
+
+                            if ( isset( $content['approval_requests'] ) ) {
+                                $details['approval_status'] = [
+                                    'name' => $content['approval_requests']['name'] ?? '',
+                                    'status' => $content['approval_requests']['status'] ?? '',
+                                    'rejection_reason' => $content['approval_requests']['rejection_reason'] ?? '',
+                                    'category' => $content['approval_requests']['category'] ?? '',
+                                    'content_type' => $content['approval_requests']['content_type'] ?? ''
+                                ];
+                            }
+
+                            $templates[ $content['sid'] ] = $details;
+                        }
+                    }
+                }
+            }
+        } catch ( Exception $e ) {
+            dt_write_log( $e );
+            return [];
+        }
+
+        return $templates;
+    }
+
+    public static function upload_messaging_template( $template_id ) {
+        if ( ! self::has_credentials() ) {
+            return null;
+        }
+
+        // Fetch corresponding template and ensure it's enabled and ready for business! ;-)
+        $messaging_templates = self::list_messaging_templates();
+        if ( isset( $messaging_templates[ $template_id ] ) && $messaging_templates[ $template_id ]['enabled'] && !empty( $messaging_templates[ $template_id ]['content_template'] ) ) {
+            try {
+
+                // As there does not seem to be a Twilio API for this operation, a raw HTTP POST request shall be constructed.
+                $url = 'https://content.twilio.com/v1/Content';
+                $options = [
+                    'http' => [
+                        'header' => [
+                            'Content-Type: application/json',
+                            'Authorization: Basic ' . base64_encode( self::get_option( self::$option_twilio_sid, '' ) .':'. self::get_option( self::$option_twilio_token, '' ) )
+                        ],
+                        'method' => 'POST',
+                        'content' => json_encode( $messaging_templates[ $template_id ]['content_template'] )
+                    ]
+                ];
+
+                $context = stream_context_create( $options );
+                $response = file_get_contents( $url, false, $context );
+
+                if ( !empty( $response ) && !is_wp_error( $response ) ) {
+                    $content = json_decode( $response, true );
+
+                    if ( !empty( $content['sid'] ) ) {
+                        return $content['sid'];
+                    }
+                }
+            } catch ( Exception $e ) {
+                dt_write_log( $e );
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    public static function submit_messaging_template( $template_id ): bool {
+        if ( !self::has_credentials() ) {
+            return false;
+        }
+
+        // Fetch corresponding template and ensure it's enabled and ready for business! ;-)
+        $messaging_templates = self::list_messaging_templates();
+        $messaging_templates_settings = self::get_option( self::$option_twilio_messaging_templates, [] );
+        if ( isset( $messaging_templates[ $template_id ] ) && $messaging_templates[ $template_id ]['enabled'] && !empty( $messaging_templates[ $template_id ]['content_template'] ) && isset( $messaging_templates_settings[ $template_id ]['content_id'] ) ) {
+            try {
+
+                $content_id = $messaging_templates_settings[ $template_id ]['content_id'];
+                $messaging_template = $messaging_templates[ $template_id ];
+
+                // Generate a name, based on template_id; ensuring structure adheres to approval request requirements - Only lowercase alphanumeric characters or underscores.
+                $content_name = trim( strtolower( str_replace( ' ', '_', $template_id ) ) );
+
+                // As there does not seem to be a Twilio API for this operation, a raw HTTP POST request shall be constructed.
+                $url = 'https://content.twilio.com/v1/Content/' . $content_id . '/ApprovalRequests/whatsapp';
+                $options = [
+                    'http' => [
+                        'header' => [
+                            'Content-Type: application/json',
+                            'Authorization: Basic ' . base64_encode( self::get_option( self::$option_twilio_sid, '' ) .':'. self::get_option( self::$option_twilio_token, '' ) )
+                        ],
+                        'method' => 'POST',
+                        'content' => json_encode( [
+                            'name' => $content_name,
+                            'category' => $messaging_template['content_category'] ?? 'UTILITY'
+                        ] )
+                    ]
+                ];
+
+                $context = stream_context_create( $options );
+                $response = file_get_contents( $url, false, $context );
+
+                if ( !empty( $response ) && !is_wp_error( $response ) ) {
+                    $approval = json_decode( $response, true );
+                    return ( !empty( $approval['status'] ) && in_array( $approval['status'], [ 'received' ] ) );
+                }
+            } catch ( Exception $e ) {
+                dt_write_log( $e );
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    public static function delete_messaging_template( $template_id ): bool {
+        if ( !self::has_credentials() ) {
+            return false;
+        }
+
+        // Fetch corresponding template and ensure it's enabled and ready for business! ;-)
+        $messaging_templates = self::list_messaging_templates();
+        $messaging_templates_settings = self::get_option( self::$option_twilio_messaging_templates, [] );
+        if ( isset( $messaging_templates[ $template_id ] ) && $messaging_templates[ $template_id ]['enabled'] && isset( $messaging_templates_settings[ $template_id ]['content_id'] ) ) {
+            try {
+
+                $content_id = $messaging_templates_settings[ $template_id ]['content_id'];
+
+                // As there does not seem to be a Twilio API for this operation, a raw HTTP DELETE request shall be constructed.
+                $url = 'https://content.twilio.com/v1/Content/' . $content_id;
+                $options = [
+                    'http' => [
+                        'header' => [
+                            'Content-Type: application/json',
+                            'Authorization: Basic ' . base64_encode( self::get_option( self::$option_twilio_sid, '' ) .':'. self::get_option( self::$option_twilio_token, '' ) )
+                        ],
+                        'method' => 'DELETE',
+                        'content' => ''
+                    ]
+                ];
+
+                $context = stream_context_create( $options );
+                $response = file_get_contents( $url, false, $context );
+
+                return ! is_wp_error( $response );
+
+            } catch ( Exception $e ) {
+                dt_write_log( $e );
+                return false;
+            }
+        }
+
+        return false;
     }
 
     public static function list_incoming_phone_numbers(): array {
