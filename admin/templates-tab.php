@@ -32,8 +32,8 @@ class Disciple_Tools_Channels_Twilio_Tab_Templates {
         wp_localize_script(
             'dt_channels_twilio_templates_script', 'dt_channels_twilio', array(
                 'messaging_templates' => Disciple_Tools_Twilio_API::list_messaging_templates() ?? [],
+                'messaging_templates_statuses' => Disciple_Tools_Twilio_API::list_messaging_templates_statuses( [ 'avoid_duplicates' => true ] ) ?? [],
                 'messaging_templates_settings' => Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_messaging_templates, [] ),
-                'messaging_templates_statuses' => Disciple_Tools_Twilio_API::list_messaging_templates_statuses() ?? [],
                 'dt_endpoint_upload_messaging_template' => Disciple_Tools_Twilio_API::fetch_endpoint_upload_messaging_template_url(),
                 'dt_endpoint_submit_messaging_template' => Disciple_Tools_Twilio_API::fetch_endpoint_submit_messaging_template_url(),
                 'dt_endpoint_reset_messaging_template' => Disciple_Tools_Twilio_API::fetch_endpoint_reset_messaging_template_url()

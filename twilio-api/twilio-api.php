@@ -334,7 +334,7 @@ class Disciple_Tools_Twilio_API {
         return apply_filters( 'dt_twilio_messaging_templates', $messaging_templates );
     }
 
-    public static function list_messaging_templates_statuses(): array {
+    public static function list_messaging_templates_statuses( $args = [] ): array {
         if ( ! self::has_credentials() ) {
             return [];
         }
@@ -362,6 +362,7 @@ class Disciple_Tools_Twilio_API {
             if ( !empty( $response ) && !is_wp_error( $response ) ) {
                 $content_and_approvals = json_decode( $response, true );
                 if ( ! empty( $content_and_approvals ) ) {
+                    $messaging_templates = self::list_messaging_templates();
                     foreach ( $content_and_approvals['contents'] ?? [] as $content ) {
 
                         // Capture content template details
@@ -382,6 +383,19 @@ class Disciple_Tools_Twilio_API {
                             }
 
                             $templates[ $content['sid'] ] = $details;
+
+                            // If specified, avoid duplicates, by ensuring remotely created template ids, are kept in sync with local settings.
+                            if ( isset( $args['avoid_duplicates'] ) && $args['avoid_duplicates'] ) {
+                                foreach ( $messaging_templates as $template_id => $template ) {
+                                    if ( $template['name'] === $details['name'] ) {
+                                        $messaging_templates_settings = self::get_option( self::$option_twilio_messaging_templates, [] );
+                                        if ( !isset( $messaging_templates_settings[$template_id], $messaging_templates_settings[$template_id]['content_id'] ) || ( $messaging_templates_settings[$template_id]['content_id'] !== $details['id'] ) ) {
+                                            $messaging_templates_settings[$template_id]['content_id'] = $details['id'];
+                                            self::set_option( self::$option_twilio_messaging_templates, $messaging_templates_settings );
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
