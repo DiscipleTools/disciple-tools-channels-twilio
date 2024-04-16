@@ -66,9 +66,9 @@ class Disciple_Tools_Twilio_Rest
 
         $type = str_contains( $params['From'], 'whatsapp' ) ? 'whatsapp' : 'phone';
 
-        if ( class_exists( 'Communication_Handles' ) ) {
+        if ( class_exists( 'DT_Conversations_API' ) ) {
 
-            $conversations_record = Communication_Handles::create_or_update_conversation_record(
+            $conversations_record = DT_Conversations_API::create_or_update_conversation_record(
                 $params['From'],
                 [ 'type' => $type ],
             );
