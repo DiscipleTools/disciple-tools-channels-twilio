@@ -174,6 +174,8 @@ jQuery(function ($) {
     let msg_service_id = $('#twilio_main_col_manage_msg_service').val();
     let msg_service_assigned_numbers_sms_id = $('#twilio_main_col_assigned_numbers_sms_select').val();
     let msg_service_assigned_numbers_whatsapp_id = $('#twilio_main_col_assigned_numbers_whatsapp_select').val();
+    let service_sms_enabled = $('#twilio_main_col_assigned_numbers_sms_notify_enabled').prop('checked') ? 1 : 0;
+    let service_whatsapp_enabled = $('#twilio_main_col_assigned_numbers_whatsapp_notify_enabled').prop('checked') ? 1 : 0;
 
     // Update submission form
     $('#twilio_main_col_manage_form_enabled').val(enabled);
@@ -183,6 +185,8 @@ jQuery(function ($) {
     $('#twilio_main_col_manage_form_msg_service_id').val(msg_service_id);
     $('#twilio_main_col_manage_form_msg_service_assigned_numbers_sms_id').val(msg_service_assigned_numbers_sms_id);
     $('#twilio_main_col_manage_form_msg_service_assigned_numbers_whatsapp_id').val(msg_service_assigned_numbers_whatsapp_id);
+    $('#twilio_main_col_manage_form_service_sms_enabled').val(service_sms_enabled);
+    $('#twilio_main_col_manage_form_service_whatsapp_enabled').val(service_whatsapp_enabled);
 
     // Post submission form
     $('#twilio_main_col_manage_form').submit();

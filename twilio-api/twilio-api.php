@@ -18,6 +18,8 @@ class Disciple_Tools_Twilio_API {
     public static $option_twilio_sid = 'dt_twilio_sid';
     public static $option_twilio_token = 'dt_twilio_token';
     public static $option_twilio_service = 'dt_twilio_service';
+    public static $option_twilio_service_sms_enabled = 'dt_twilio_service_sms_enabled';
+    public static $option_twilio_service_whatsapp_enabled = 'dt_twilio_service_whatsapp_enabled';
     public static $option_twilio_msg_service_id = 'dt_twilio_msg_service_id';
     public static $option_twilio_number_id = 'dt_twilio_number_id';
     public static $option_twilio_assigned_numbers_sms_id = 'dt_twilio_assigned_numbers_sms_id';

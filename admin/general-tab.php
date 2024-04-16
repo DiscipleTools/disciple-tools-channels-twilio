@@ -50,6 +50,13 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
             if ( isset( $_POST['twilio_main_col_manage_form_msg_service_assigned_numbers_whatsapp_id'] ) ) {
                 Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_assigned_numbers_whatsapp_id, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_msg_service_assigned_numbers_whatsapp_id'] ) ) );
             }
+            if ( isset( $_POST['twilio_main_col_manage_form_service_sms_enabled'] ) ) {
+                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_service_sms_enabled, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_service_sms_enabled'] ) ) );
+            }
+            if ( isset( $_POST['twilio_main_col_manage_form_service_whatsapp_enabled'] ) ) {
+                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_service_whatsapp_enabled, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_service_whatsapp_enabled'] ) ) );
+            }
+
         }
     }
 
@@ -251,6 +258,12 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
 
             <input type="hidden" value="" id="twilio_main_col_manage_form_msg_service_assigned_numbers_whatsapp_id"
                    name="twilio_main_col_manage_form_msg_service_assigned_numbers_whatsapp_id"/>
+
+            <input type="hidden" value="" id="twilio_main_col_manage_form_service_sms_enabled"
+                   name="twilio_main_col_manage_form_service_sms_enabled"/>
+
+            <input type="hidden" value="" id="twilio_main_col_manage_form_service_whatsapp_enabled"
+                   name="twilio_main_col_manage_form_service_whatsapp_enabled"/>
         </form>
         <?php
     }
@@ -276,7 +289,9 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                         <tr>
                             <td style="vertical-align: middle;">D.T Site Notifications Enabled</td>
                             <td>
-                                <input type="checkbox" id="twilio_main_col_assigned_numbers_sms_notify_enabled" />
+                                <?php $sms_enabled = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_service_sms_enabled, false ); ?>
+                                <input type="checkbox"
+                                       id="twilio_main_col_assigned_numbers_sms_notify_enabled" <?php echo esc_attr( $sms_enabled ? 'checked' : '' ); ?> />
                             </td>
                         </tr>
                         <tr>
@@ -293,7 +308,9 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                         <tr>
                             <td style="vertical-align: middle;">D.T Site Notifications Enabled</td>
                             <td>
-                                <input type="checkbox" id="twilio_main_col_assigned_numbers_whatsapp_notify_enabled" />
+                                <?php $whatsapp_enabled = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_service_whatsapp_enabled, false ); ?>
+                                <input type="checkbox"
+                                       id="twilio_main_col_assigned_numbers_whatsapp_notify_enabled" <?php echo esc_attr( $whatsapp_enabled ? 'checked' : '' ); ?> />
                             </td>
                         </tr>
                         <tr>
