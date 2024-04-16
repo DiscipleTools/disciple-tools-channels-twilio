@@ -56,7 +56,6 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
             if ( isset( $_POST['twilio_main_col_manage_form_service_whatsapp_enabled'] ) ) {
                 Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_service_whatsapp_enabled, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_service_whatsapp_enabled'] ) ) );
             }
-
         }
     }
 
