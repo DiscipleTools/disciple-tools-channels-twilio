@@ -106,11 +106,12 @@ class Disciple_Tools_Twilio_API {
                     'friendly_name' => 'Created',
                     'language' => 'en',
                     'variables' => [
-                        '1' => '-- name --'
+                        '1' => '-- name --',
+                        '2' => '-- link --'
                     ],
                     'types' => [
                         'twilio/text' => [
-                            'body' => '{{1}} was created and assigned to you.'
+                            'body' => 'Disciple.Tools notification: {{1}} was created and assigned to you. \nClick {{2}} to update the record.'
                         ]
                     ]
                 ]
@@ -125,11 +126,12 @@ class Disciple_Tools_Twilio_API {
                     'friendly_name' => 'Assigned To',
                     'language' => 'en',
                     'variables' => [
-                        '1' => '-- name --'
+                        '1' => '-- name --',
+                        '2' => '-- link --'
                     ],
                     'types' => [
                         'twilio/text' => [
-                            'body' => 'You have been assigned: {{1}}.'
+                            'body' => 'Disciple.Tools notification: You have been assigned: {{1}}. \nClick {{2}} to update the record.'
                         ]
                     ]
                 ]
@@ -146,11 +148,12 @@ class Disciple_Tools_Twilio_API {
                     'variables' => [
                         '1' => '-- name1 --',
                         '2' => '-- name2 --',
-                        '3' => '-- name3 --'
+                        '3' => '-- name3 --',
+                        '4' => '-- link --'
                     ],
                     'types' => [
                         'twilio/text' => [
-                            'body' => '{{1}} assigned {{2}} to {{3}}.'
+                            'body' => 'Disciple.Tools notification: {{1}} assigned {{2}} to {{3}}. \nClick {{4}} to update the record.'
                         ]
                     ]
                 ]
@@ -166,11 +169,12 @@ class Disciple_Tools_Twilio_API {
                     'language' => 'en',
                     'variables' => [
                         '1' => '-- name1 --',
-                        '2' => '-- name2 --'
+                        '2' => '-- name2 --',
+                        '3' => '-- link --'
                     ],
                     'types' => [
                         'twilio/text' => [
-                            'body' => '{{1}} shared {{2}} with you.'
+                            'body' => 'Disciple.Tools notification: {{1}} shared {{2}} with you. \nClick {{3}} to update the record.'
                         ]
                     ]
                 ]
@@ -187,11 +191,12 @@ class Disciple_Tools_Twilio_API {
                     'variables' => [
                         '1' => '-- name1 --',
                         '2' => '-- name2 --',
-                        '3' => '-- mention --'
+                        '3' => '-- mention --',
+                        '4' => '-- link --'
                     ],
                     'types' => [
                         'twilio/text' => [
-                            'body' => '{{1}} mentioned you on {{2}} saying: {{3}}'
+                            'body' => 'Disciple.Tools notification: {{1}} mentioned you on {{2}} saying: {{3}} \nClick {{4}} to update the record.'
                         ]
                     ]
                 ]
@@ -208,11 +213,12 @@ class Disciple_Tools_Twilio_API {
                     'variables' => [
                         '1' => '-- name1 --',
                         '2' => '-- name2 --',
-                        '3' => '-- comment --'
+                        '3' => '-- comment --',
+                        '4' => '-- link --'
                     ],
                     'types' => [
                         'twilio/text' => [
-                            'body' => '{{1}} commented on {{2}} saying: {{3}}'
+                            'body' => 'Disciple.Tools notification: {{1}} commented on {{2}} saying: {{3}} \nClick {{4}} to update the record.'
                         ]
                     ]
                 ]
@@ -228,11 +234,12 @@ class Disciple_Tools_Twilio_API {
                     'language' => 'en',
                     'variables' => [
                         '1' => '-- name1 --',
-                        '2' => '-- name2 --'
+                        '2' => '-- name2 --',
+                        '3' => '-- link --'
                     ],
                     'types' => [
                         'twilio/text' => [
-                            'body' => '{{1}} subassigned {{2}} to you.'
+                            'body' => 'Disciple.Tools notification: {{1}} subassigned {{2}} to you. \nClick {{3}} to update the record.'
                         ]
                     ]
                 ]
@@ -249,11 +256,12 @@ class Disciple_Tools_Twilio_API {
                     'variables' => [
                         '1' => '-- name1 --',
                         '2' => '-- milestone --',
-                        '3' => '-- name3 --'
+                        '3' => '-- name3 --',
+                        '4' => '-- link --'
                     ],
                     'types' => [
                         'twilio/text' => [
-                            'body' => '{{1}} added milestone {{2}} on {{3}}.'
+                            'body' => 'Disciple.Tools notification: {{1}} added milestone {{2}} on {{3}}. \nClick {{4}} to update the record.'
                         ]
                     ]
                 ]
@@ -269,11 +277,12 @@ class Disciple_Tools_Twilio_API {
                     'language' => 'en',
                     'variables' => [
                         '1' => '-- name1 --',
-                        '2' => '-- name2 --'
+                        '2' => '-- name2 --',
+                        '3' => '-- link --'
                     ],
                     'types' => [
                         'twilio/text' => [
-                            'body' => '@{{1}}, an update is requested on {{2}}.'
+                            'body' => 'Disciple.Tools notification: @{{1}}, an update is requested on {{2}}. \nClick {{3}} to update the record.'
                         ]
                     ]
                 ]
@@ -289,11 +298,12 @@ class Disciple_Tools_Twilio_API {
                     'language' => 'en',
                     'variables' => [
                         '1' => '-- name1 --',
-                        '2' => '-- name2 --'
+                        '2' => '-- name2 --',
+                        '3' => '-- link --'
                     ],
                     'types' => [
                         'twilio/text' => [
-                            'body' => '{{1}} modified contact details on {{2}}.'
+                            'body' => 'Disciple.Tools notification: {{1}} modified contact details on {{2}}. \nClick {{3}} to update the record.'
                         ]
                     ]
                 ]
@@ -309,11 +319,12 @@ class Disciple_Tools_Twilio_API {
                     'language' => 'en',
                     'variables' => [
                         '1' => '-- name1 --',
-                        '2' => '-- name2 --'
+                        '2' => '-- name2 --',
+                        '3' => '-- link --'
                     ],
                     'types' => [
                         'twilio/text' => [
-                            'body' => '{{1}} declined assignment on: {{2}}.'
+                            'body' => 'Disciple.Tools notification: {{1}} declined assignment on: {{2}}. \nClick {{3}} to update the record.'
                         ]
                     ]
                 ]
