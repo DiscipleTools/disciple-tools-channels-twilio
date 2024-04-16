@@ -267,12 +267,18 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                    data-number_type="whatsapp">WhatsApp</a>
             </nav>
             <br>
-            <div id="twilio_main_col_assigned_numbers_tab_content" class="numbers-nav-tab-content" style="text-align: center;">
+            <div id="twilio_main_col_assigned_numbers_tab_content" class="numbers-nav-tab-content">
                 <span id="twilio_main_col_assigned_numbers_tab_content_spinner" class="loading-spinner active" style="display: none;"></span>
                 <span id="twilio_main_col_assigned_numbers_tab_content_msg" style="display: none;"></span>
 
-                <div id="twilio_main_col_assigned_numbers_tab_content_sms" class="numbers-nav-tab-content" style="display: none; text-align: center;">
+                <div id="twilio_main_col_assigned_numbers_tab_content_sms" class="numbers-nav-tab-content" style="display: none;">
                     <table class="widefat striped">
+                        <tr>
+                            <td style="vertical-align: middle;">D.T Site Notifications Enabled</td>
+                            <td>
+                                <input type="checkbox" id="twilio_main_col_assigned_numbers_sms_notify_enabled" />
+                            </td>
+                        </tr>
                         <tr>
                             <td style="vertical-align: middle;">Phone Numbers</td>
                             <td>
@@ -282,8 +288,14 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                     </table>
                 </div>
 
-                <div id="twilio_main_col_assigned_numbers_tab_content_whatsapp" class="numbers-nav-tab-content" style="display: none; text-align: center;">
+                <div id="twilio_main_col_assigned_numbers_tab_content_whatsapp" class="numbers-nav-tab-content" style="display: none;">
                     <table class="widefat striped">
+                        <tr>
+                            <td style="vertical-align: middle;">D.T Site Notifications Enabled</td>
+                            <td>
+                                <input type="checkbox" id="twilio_main_col_assigned_numbers_whatsapp_notify_enabled" />
+                            </td>
+                        </tr>
                         <tr>
                             <td style="vertical-align: middle;">Phone Numbers</td>
                             <td>

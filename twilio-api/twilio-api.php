@@ -760,6 +760,89 @@ class Disciple_Tools_Twilio_API {
         return false;
     }
 
+    public static function send_sms( $phone_number, $message ): bool {
+        return self::send_by_service( 'sms', $phone_number, $message );
+    }
+
+    public static function send_whatsapp( $phone_number, $message ): bool {
+        return self::send_by_service( 'whatsapp', $phone_number, $message );
+    }
+
+    private static function send_by_service( $service, $phone_number, $message ): bool {
+        if ( ! self::has_credentials() ) {
+            return false;
+        }
+
+        // Ensure required params are present.
+        if ( empty( $service ) || empty( $phone_number ) || empty( $message ) ) {
+            return false;
+        }
+
+        try {
+
+            // Ensure a valid messaging service id has been set.
+            $messaging_service_id = self::get_option( self::$option_twilio_msg_service_id );
+            if ( !empty( $messaging_service_id ) ) {
+
+                // List all numbers currently assigned to messaging service.
+                $messaging_service_phone_numbers = self::list_messaging_services_phone_numbers( $messaging_service_id );
+                if ( !empty( $messaging_service_phone_numbers ) ) {
+                    $from_number = null;
+                    $messaging_service_phone_numbers_by_service = ( ( $service === 'sms' ) ? $messaging_service_phone_numbers['sms'] ?? [] : $messaging_service_phone_numbers['whatsapp'] ?? [] );
+
+                    // Determine if an assigned number has been specified and fetch corresponding phone number.
+                    $assigned_numbers_id = self::get_option( ( ( $service === 'sms' ) ? self::$option_twilio_assigned_numbers_sms_id : self::$option_twilio_assigned_numbers_whatsapp_id ) );
+                    if ( !empty( $assigned_numbers_id ) ) {
+                        foreach ( $messaging_service_phone_numbers_by_service as $messaging_service_phone_number ) {
+                            if ( isset( $messaging_service_phone_number['id'] ) && !empty( $messaging_service_phone_number['number'] ) && ( $messaging_service_phone_number['id'] === $assigned_numbers_id ) ) {
+                                $from_number = $messaging_service_phone_number['number'];
+                            }
+                        }
+                    }
+
+                    // If $from_number is still empty, attempt to fetch the first available number!
+                    if ( empty( $from_number ) && !empty( $messaging_service_phone_numbers_by_service ) && isset( $messaging_service_phone_numbers_by_service[0]['id'], $messaging_service_phone_numbers_by_service[0]['number'] ) ) {
+                        $from_number = $messaging_service_phone_numbers_by_service[0]['number'];
+                    }
+
+                    // Only proceed, if a valid from number has been identified!
+                    if ( !empty( $from_number ) ) {
+
+                        // Establish Twilio client session
+                        $twilio = new Client( self::get_option( self::$option_twilio_sid ), self::get_option( self::$option_twilio_token ) );
+
+                        // Determine service prefix.
+                        switch ( $service ) {
+                            case 'whatsapp':
+                                $service_prefix = 'whatsapp:';
+                                break;
+                            default:
+                                $service_prefix = ''; // Default to SMS
+                                break;
+                        }
+
+                        // Prepare message options.
+                        $msg_opts = [
+                            'body' => $message,
+                            'from' => $service_prefix . $from_number,
+                            'messagingServiceSid' => $messaging_service_id
+                        ];
+
+                        // Dispatch message...!
+                        $message_result = $twilio->messages->create(
+                            $service_prefix . $phone_number,
+                            $msg_opts
+                        );
+                    }
+                }
+            }
+        } catch ( Exception $e ) {
+            return false;
+        }
+
+        return false;
+    }
+
     public static function get_user_phone_numbers( $user ): array {
         $field        = [];
         $user_contact = null;
