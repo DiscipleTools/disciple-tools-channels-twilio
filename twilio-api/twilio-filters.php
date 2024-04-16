@@ -128,11 +128,11 @@ function dt_get_site_notification_options( $notifications ) {
 
         // Ensure to unset channels and corresponding types.
         unset( $notifications['channels'][$channel_key_sms] );
-        unset( $notifications['channels']['whatsapp'] );
+        unset( $notifications['channels'][$channel_key_whatsapp] );
 
         foreach ( $notifications['types'] ?? [] as $type => $type_settings ) {
             unset( $notifications['types'][$type][$channel_key_sms] );
-            unset( $notifications['types'][$type]['whatsapp'] );
+            unset( $notifications['types'][$type][$channel_key_whatsapp] );
         }
     }
 
