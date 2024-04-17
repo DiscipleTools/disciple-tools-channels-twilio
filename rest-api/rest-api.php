@@ -87,6 +87,16 @@ class Disciple_Tools_Twilio_Endpoints {
                 }
             ]
         );
+
+        register_rest_route(
+            $namespace, '/template_actions', [
+                'methods'             => WP_REST_Server::CREATABLE,
+                'callback'            => [ $this, 'template_actions' ],
+                'permission_callback' => function ( WP_REST_Request $request ) {
+                    return $this->has_permission();
+                }
+            ]
+        );
     }
 
     public function list_phone_numbers( WP_REST_Request $request ): array {
@@ -118,21 +128,12 @@ class Disciple_Tools_Twilio_Endpoints {
             $template_id = $params['template_id'];
 
             // Execute content template creation on Twilio servers.
-            $content_id = Disciple_Tools_Twilio_API::upload_messaging_template( $template_id );
+            $content_id = $this->handle_upload_messaging_template( $template_id, $params );
 
-            // If valid and auto save true, capture newly created content id within template settings.
-            if ( !empty( $content_id ) && ( $params['auto_save'] ?? true ) ) {
-                $messaging_templates_settings = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_messaging_templates, [] );
-
-                if ( !isset( $messaging_templates_settings[ $template_id ] ) ) {
-                    $messaging_templates_settings[ $template_id ] = [];
-                }
-
-                $messaging_templates_settings[ $template_id ]['content_id'] = $content_id;
-                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_messaging_templates, $messaging_templates_settings );
+            // Capture whatever needs to be captured!
+            if ( !empty( $content_id ) ) {
+                $response['content_id'] = $content_id;
             }
-
-            $response['content_id'] = $content_id;
         }
 
         return $response;
@@ -147,7 +148,7 @@ class Disciple_Tools_Twilio_Endpoints {
             $template_id = $params['template_id'];
 
             // Execute content template approval submission to Twilio & WhatsApp servers.
-            $response['submitted'] = Disciple_Tools_Twilio_API::submit_messaging_template( $template_id );
+            $response['submitted'] = $this->handle_submit_messaging_template( $template_id );
         }
 
         return $response;
@@ -177,6 +178,93 @@ class Disciple_Tools_Twilio_Endpoints {
         }
 
         return $response;
+    }
+
+    public function template_actions( WP_REST_Request $request ): array {
+        $response = [];
+
+        $params = $request->get_params();
+
+        if ( isset( $params['action'] ) ) {
+            $action = $params['action'];
+            $processed_counter = 0;
+
+            // Fetch the current state of template settings.
+            $messaging_templates = Disciple_Tools_Twilio_API::list_messaging_templates() ?? [];
+            $messaging_templates_statuses = Disciple_Tools_Twilio_API::list_messaging_templates_statuses( [ 'avoid_duplicates' => true ] ) ?? [];
+            $messaging_templates_settings = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_messaging_templates, [] );
+
+            foreach ( $messaging_templates as $template_id => $template ) {
+                if ( isset( $template['enabled'] ) && $template['enabled'] && !empty( $template['content_template'] ) ) {
+
+                    // Determine if template can be uploaded or submitted.
+                    $can_upload = ( !isset( $messaging_templates_settings[ $template_id ] ) || !isset( $messaging_templates_settings[ $template_id ]['content_id'] ) );
+
+                    $can_submit = false;
+                    if ( isset( $messaging_templates_settings[ $template_id ]['content_id'] ) && isset( $messaging_templates_statuses[ $messaging_templates_settings[ $template_id ]['content_id'] ] ) ) {
+                        $content = $messaging_templates_statuses[ $messaging_templates_settings[ $template_id ]['content_id'] ];
+
+                        // Determine content's current status and subsequent actions to be made available.
+                        $can_submit = ( $content['approval_status']['status'] === 'unsubmitted' );
+                    }
+
+                    // Determine bulk auto action to be carried out across relevant templates.
+                    switch ( $action ) {
+                        case 'upload':
+                            if ( $can_upload && !empty( $this->handle_upload_messaging_template( $template_id ) ) ) {
+                                $processed_counter++;
+                            }
+                            break;
+                        case 'submit':
+                            if ( $can_submit && $this->handle_submit_messaging_template( $template_id ) ) {
+                                $processed_counter++;
+                            }
+                            break;
+                    }
+                }
+            }
+
+            $response['action'] = $action;
+            $response['processed_count'] = $processed_counter;
+        }
+
+        return $response;
+    }
+
+    private function handle_upload_messaging_template( $template_id, $args = [] ) {
+        $content_id = null;
+
+        if ( isset( $template_id ) ) {
+
+            // Execute content template creation on Twilio servers.
+            $content_id = Disciple_Tools_Twilio_API::upload_messaging_template( $template_id );
+
+            // If valid and auto save true, capture newly created content id within template settings.
+            if ( !empty( $content_id ) && ( $args['auto_save'] ?? true ) ) {
+                $messaging_templates_settings = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_messaging_templates, [] );
+
+                if ( !isset( $messaging_templates_settings[ $template_id ] ) ) {
+                    $messaging_templates_settings[ $template_id ] = [];
+                }
+
+                $messaging_templates_settings[ $template_id ]['content_id'] = $content_id;
+                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_messaging_templates, $messaging_templates_settings );
+            }
+        }
+
+        return $content_id;
+    }
+
+    private function handle_submit_messaging_template( $template_id ): bool {
+        $submitted = false;
+
+        if ( isset( $template_id ) ) {
+
+            // Execute content template approval submission to Twilio & WhatsApp servers.
+            $submitted = Disciple_Tools_Twilio_API::submit_messaging_template( $template_id );
+        }
+
+        return $submitted;
     }
 }
 

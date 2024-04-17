@@ -34,6 +34,14 @@ jQuery(function ($) {
     assigned_numbers_tab_switch( $(e.target).data('number_type') );
   });
 
+  $(document).on('click', '#twilio_main_col_assigned_numbers_whatsapp_templates_upload_all', function (e) {
+    handle_whatsapp_templates_auto_actions( 'upload', $(e.currentTarget) );
+  });
+
+  $(document).on('click', '#twilio_main_col_assigned_numbers_whatsapp_templates_submit_all', function (e) {
+    handle_whatsapp_templates_auto_actions( 'submit', $(e.currentTarget) );
+  });
+
   function handle_docs_request(title_div, content_div) {
     $('#twilio_right_docs_section').fadeOut('fast', function () {
       $('#twilio_right_docs_title').html($('#' + title_div).html());
@@ -161,6 +169,52 @@ jQuery(function ($) {
       case 'sms':
         $(tab_content_sms).fadeIn('fast');
         break;
+    }
+  }
+
+  function handle_whatsapp_templates_auto_actions( action, button = null ) {
+    if ( confirm(`Are you sure you wish to ${action} all templates?`) ) {
+      const message_span = $('#twilio_main_col_assigned_numbers_whatsapp_templates_message');
+      $(message_span).addClass('loading-spinner active').html('').fadeIn('fast');
+
+      if (button) {
+        $(button).prop('disabled', true);
+      }
+
+      $.ajax({
+        url: window.dt_channels_twilio.dt_endpoint_template_actions,
+        method: 'POST',
+        data: {
+          'action': action
+        },
+        beforeSend: (xhr) => {
+          xhr.setRequestHeader("X-WP-Nonce", window.dt_admin_scripts.nonce);
+        },
+        success: function (data) {
+          let message = 'No results returned. Please check Templates Tab and try again!';
+          if ((data['action']!==undefined) && (data['processed_count']!==undefined)) {
+            const action_prefix_text = (data['action']==='upload') ? 'Uploaded':'Submitted';
+            message = `${action_prefix_text} ${data['processed_count']} Templates.`;
+          }
+          $(message_span).fadeOut('fast', function () {
+            $(message_span).removeClass('loading-spinner active');
+            $(message_span).html(message);
+            $(message_span).fadeIn('fast');
+          });
+
+          if (button) {
+            $(button).prop('disabled', false);
+          }
+        },
+        error: function (data) {
+          console.log(data);
+          $(message_span).fadeOut('fast').removeClass('loading-spinner active').html('');
+
+          if (button) {
+            $(button).prop('disabled', false);
+          }
+        }
+      });
     }
   }
 

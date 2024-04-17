@@ -175,7 +175,7 @@ jQuery(function ($) {
                 // Remove spinner, but keep button disabled!
                 if (action_but) {
                   $(action_but).find('span')
-                  .removeClass('loading-spinner active ')
+                  .removeClass('loading-spinner active')
                   .css('width', '')
                   .css('height', '')
                   .addClass('mdi mdi-cloud-upload-outline');
@@ -186,7 +186,7 @@ jQuery(function ($) {
 
                 if (action_but) {
                   $(action_but).find('span')
-                  .removeClass('loading-spinner active ')
+                  .removeClass('loading-spinner active')
                   .css('width', '')
                   .css('height', '')
                   .addClass('mdi mdi-cloud-upload-outline');
@@ -236,7 +236,7 @@ jQuery(function ($) {
                 // Remove spinner, but keep button disabled!
                 if (action_but) {
                   $(action_but).find('span')
-                  .removeClass('loading-spinner active ')
+                  .removeClass('loading-spinner active')
                   .css('width', '')
                   .css('height', '')
                   .addClass('mdi mdi-cogs');
@@ -247,7 +247,7 @@ jQuery(function ($) {
 
                 if (action_but) {
                   $(action_but).find('span')
-                  .removeClass('loading-spinner active ')
+                  .removeClass('loading-spinner active')
                   .css('width', '')
                   .css('height', '')
                   .addClass('mdi mdi-cogs');
@@ -297,7 +297,7 @@ jQuery(function ($) {
                 // Remove spinner, but keep button disabled!
                 if (action_but) {
                   $(action_but).find('span')
-                  .removeClass('loading-spinner active ')
+                  .removeClass('loading-spinner active')
                   .css('width', '')
                   .css('height', '')
                   .addClass('mdi mdi-backup-restore');
@@ -308,7 +308,7 @@ jQuery(function ($) {
 
                 if (action_but) {
                   $(action_but).find('span')
-                  .removeClass('loading-spinner active ')
+                  .removeClass('loading-spinner active')
                   .css('width', '')
                   .css('height', '')
                   .addClass('mdi mdi-backup-restore');

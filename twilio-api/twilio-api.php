@@ -42,6 +42,10 @@ class Disciple_Tools_Twilio_API {
         return trailingslashit( site_url() ) . 'wp-json/disciple_tools_channels_twilio/v1/reset_messaging_template';
     }
 
+    public static function fetch_endpoint_template_actions_url(): string {
+        return trailingslashit( site_url() ) . 'wp-json/disciple_tools_channels_twilio/v1/template_actions';
+    }
+
     public static function is_enabled(): bool {
         $enabled = get_option( self::$option_twilio_enabled );
 

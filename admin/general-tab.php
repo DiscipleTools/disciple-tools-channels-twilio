@@ -21,6 +21,7 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
         wp_localize_script(
             'dt_channels_twilio_general_script', 'dt_channels_twilio', array(
                 'dt_endpoint_list_phone_numbers' => Disciple_Tools_Twilio_API::fetch_endpoint_list_phone_numbers_url(),
+                'dt_endpoint_template_actions' => Disciple_Tools_Twilio_API::fetch_endpoint_template_actions_url(),
                 'assigned_numbers_sms_id' => Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_assigned_numbers_sms_id ),
                 'assigned_numbers_whatsapp_id' => Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_assigned_numbers_whatsapp_id )
             )
@@ -316,6 +317,15 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                             <td style="vertical-align: middle;">Phone Numbers</td>
                             <td>
                                 <select id="twilio_main_col_assigned_numbers_whatsapp_select" style="min-width: 100%;"></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align: middle;">Templates</td>
+                            <td>
+                                <button id="twilio_main_col_assigned_numbers_whatsapp_templates_upload_all" class="button">Upload All</button>
+                                <button id="twilio_main_col_assigned_numbers_whatsapp_templates_submit_all" class="button">Submit All For Approval</button>
+                                <br>
+                                <span id="twilio_main_col_assigned_numbers_whatsapp_templates_message" style="display: none; margin-top: 5px;"></span>
                             </td>
                         </tr>
                     </table>
