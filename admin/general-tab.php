@@ -319,7 +319,7 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                                 <select id="twilio_main_col_assigned_numbers_whatsapp_select" style="min-width: 100%;"></select>
                             </td>
                         </tr>
-                        <tr>
+                        <!--<tr>
                             <td style="vertical-align: middle;">Templates</td>
                             <td>
                                 <button id="twilio_main_col_assigned_numbers_whatsapp_templates_upload_all" class="button">Upload All</button>
@@ -327,7 +327,7 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                                 <br>
                                 <span id="twilio_main_col_assigned_numbers_whatsapp_templates_message" style="display: none; margin-top: 5px;"></span>
                             </td>
-                        </tr>
+                        </tr>-->
                     </table>
                 </div>
             </div>

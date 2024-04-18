@@ -83,254 +83,22 @@ class Disciple_Tools_Twilio_API {
 
     public static function list_messaging_templates(): array {
         $messaging_templates = [
-            'hello_world' => [
-                'id' => 'hello_world',
-                'name' => 'Hello World',
+            'dt_notifications' => [
+                'id' => 'dt_notifications',
+                'name' => 'D.T Notifications',
                 'type' => 'whatsapp',
                 'enabled' => true,
                 'content_category' => 'UTILITY',
                 'content_template' => [
-                    'friendly_name' => 'Hello World',
+                    'friendly_name' => 'D.T Notifications',
                     'language' => 'en',
                     'variables' => [
-                        '1' => '-- name --'
+                        '1' => 'John mentioned you on contact Bob saying: @Jared, can you respond?',
+                        '2' => 'http://example.com/contact/123/'
                     ],
                     'types' => [
                         'twilio/text' => [
-                            'body' => 'Hi {{1}}, \n Hello World!'
-                        ]
-                    ]
-                ]
-            ],
-            'created' => [
-                'id' => 'created',
-                'name' => 'Created',
-                'type' => 'whatsapp',
-                'enabled' => true,
-                'content_category' => 'UTILITY',
-                'content_template' => [
-                    'friendly_name' => 'Created',
-                    'language' => 'en',
-                    'variables' => [
-                        '1' => '-- name --',
-                        '2' => '-- link --'
-                    ],
-                    'types' => [
-                        'twilio/text' => [
-                            'body' => 'Disciple.Tools notification: {{1}} was created and assigned to you. \nClick {{2}} to update the record.'
-                        ]
-                    ]
-                ]
-            ],
-            'assigned_to' => [
-                'id' => 'assigned_to',
-                'name' => 'Assigned To',
-                'type' => 'whatsapp',
-                'enabled' => true,
-                'content_category' => 'UTILITY',
-                'content_template' => [
-                    'friendly_name' => 'Assigned To',
-                    'language' => 'en',
-                    'variables' => [
-                        '1' => '-- name --',
-                        '2' => '-- link --'
-                    ],
-                    'types' => [
-                        'twilio/text' => [
-                            'body' => 'Disciple.Tools notification: You have been assigned: {{1}}. \nClick {{2}} to update the record.'
-                        ]
-                    ]
-                ]
-            ],
-            'assigned_to_other' => [
-                'id' => 'assigned_to_other',
-                'name' => 'Assigned To Other',
-                'type' => 'whatsapp',
-                'enabled' => true,
-                'content_category' => 'UTILITY',
-                'content_template' => [
-                    'friendly_name' => 'Assigned To Other',
-                    'language' => 'en',
-                    'variables' => [
-                        '1' => '-- name1 --',
-                        '2' => '-- name2 --',
-                        '3' => '-- name3 --',
-                        '4' => '-- link --'
-                    ],
-                    'types' => [
-                        'twilio/text' => [
-                            'body' => 'Disciple.Tools notification: {{1}} assigned {{2}} to {{3}}. \nClick {{4}} to update the record.'
-                        ]
-                    ]
-                ]
-            ],
-            'share' => [
-                'id' => 'share',
-                'name' => 'Share',
-                'type' => 'whatsapp',
-                'enabled' => true,
-                'content_category' => 'UTILITY',
-                'content_template' => [
-                    'friendly_name' => 'Share',
-                    'language' => 'en',
-                    'variables' => [
-                        '1' => '-- name1 --',
-                        '2' => '-- name2 --',
-                        '3' => '-- link --'
-                    ],
-                    'types' => [
-                        'twilio/text' => [
-                            'body' => 'Disciple.Tools notification: {{1}} shared {{2}} with you. \nClick {{3}} to update the record.'
-                        ]
-                    ]
-                ]
-            ],
-            'mention' => [
-                'id' => 'mention',
-                'name' => '@Mentions',
-                'type' => 'whatsapp',
-                'enabled' => true,
-                'content_category' => 'UTILITY',
-                'content_template' => [
-                    'friendly_name' => '@Mentions',
-                    'language' => 'en',
-                    'variables' => [
-                        '1' => '-- name1 --',
-                        '2' => '-- name2 --',
-                        '3' => '-- mention --',
-                        '4' => '-- link --'
-                    ],
-                    'types' => [
-                        'twilio/text' => [
-                            'body' => 'Disciple.Tools notification: {{1}} mentioned you on {{2}} saying: {{3}} \nClick {{4}} to update the record.'
-                        ]
-                    ]
-                ]
-            ],
-            'comment' => [
-                'id' => 'comment',
-                'name' => 'New Comments',
-                'type' => 'whatsapp',
-                'enabled' => true,
-                'content_category' => 'UTILITY',
-                'content_template' => [
-                    'friendly_name' => 'New Comments',
-                    'language' => 'en',
-                    'variables' => [
-                        '1' => '-- name1 --',
-                        '2' => '-- name2 --',
-                        '3' => '-- comment --',
-                        '4' => '-- link --'
-                    ],
-                    'types' => [
-                        'twilio/text' => [
-                            'body' => 'Disciple.Tools notification: {{1}} commented on {{2}} saying: {{3}} \nClick {{4}} to update the record.'
-                        ]
-                    ]
-                ]
-            ],
-            'subassigned' => [
-                'id' => 'subassigned',
-                'name' => 'Sub-Assigned',
-                'type' => 'whatsapp',
-                'enabled' => true,
-                'content_category' => 'UTILITY',
-                'content_template' => [
-                    'friendly_name' => 'Sub-Assigned',
-                    'language' => 'en',
-                    'variables' => [
-                        '1' => '-- name1 --',
-                        '2' => '-- name2 --',
-                        '3' => '-- link --'
-                    ],
-                    'types' => [
-                        'twilio/text' => [
-                            'body' => 'Disciple.Tools notification: {{1}} subassigned {{2}} to you. \nClick {{3}} to update the record.'
-                        ]
-                    ]
-                ]
-            ],
-            'milestone' => [
-                'id' => 'milestone',
-                'name' => 'Contact Milestones and Group Health metrics',
-                'type' => 'whatsapp',
-                'enabled' => true,
-                'content_category' => 'UTILITY',
-                'content_template' => [
-                    'friendly_name' => 'Contact Milestones and Group Health metrics',
-                    'language' => 'en',
-                    'variables' => [
-                        '1' => '-- name1 --',
-                        '2' => '-- milestone --',
-                        '3' => '-- name3 --',
-                        '4' => '-- link --'
-                    ],
-                    'types' => [
-                        'twilio/text' => [
-                            'body' => 'Disciple.Tools notification: {{1}} added milestone {{2}} on {{3}}. \nClick {{4}} to update the record.'
-                        ]
-                    ]
-                ]
-            ],
-            'requires_update' => [
-                'id' => 'requires_update',
-                'name' => 'Requires Update',
-                'type' => 'whatsapp',
-                'enabled' => true,
-                'content_category' => 'UTILITY',
-                'content_template' => [
-                    'friendly_name' => 'Requires Update',
-                    'language' => 'en',
-                    'variables' => [
-                        '1' => '-- name1 --',
-                        '2' => '-- name2 --',
-                        '3' => '-- link --'
-                    ],
-                    'types' => [
-                        'twilio/text' => [
-                            'body' => 'Disciple.Tools notification: @{{1}}, an update is requested on {{2}}. \nClick {{3}} to update the record.'
-                        ]
-                    ]
-                ]
-            ],
-            'contact_info_update' => [
-                'id' => 'contact_info_update',
-                'name' => 'Contact Info Update',
-                'type' => 'whatsapp',
-                'enabled' => true,
-                'content_category' => 'UTILITY',
-                'content_template' => [
-                    'friendly_name' => 'Contact Info Update',
-                    'language' => 'en',
-                    'variables' => [
-                        '1' => '-- name1 --',
-                        '2' => '-- name2 --',
-                        '3' => '-- link --'
-                    ],
-                    'types' => [
-                        'twilio/text' => [
-                            'body' => 'Disciple.Tools notification: {{1}} modified contact details on {{2}}. \nClick {{3}} to update the record.'
-                        ]
-                    ]
-                ]
-            ],
-            'assignment_declined' => [
-                'id' => 'assignment_declined',
-                'name' => 'Assignment Declined',
-                'type' => 'whatsapp',
-                'enabled' => true,
-                'content_category' => 'UTILITY',
-                'content_template' => [
-                    'friendly_name' => 'Assignment Declined',
-                    'language' => 'en',
-                    'variables' => [
-                        '1' => '-- name1 --',
-                        '2' => '-- name2 --',
-                        '3' => '-- link --'
-                    ],
-                    'types' => [
-                        'twilio/text' => [
-                            'body' => 'Disciple.Tools notification: {{1}} declined assignment on: {{2}}. \nClick {{3}} to update the record.'
+                            'body' => 'Disciple.Tools Notification:\n\n {{1}}\n\n Open {{2}} to respond.'
                         ]
                     ]
                 ]
@@ -790,63 +558,132 @@ class Disciple_Tools_Twilio_API {
             $messaging_service_id = self::get_option( self::$option_twilio_msg_service_id );
             if ( !empty( $messaging_service_id ) ) {
 
-                // List all numbers currently assigned to messaging service.
-                $messaging_service_phone_numbers = self::list_messaging_services_phone_numbers( $messaging_service_id );
-                if ( !empty( $messaging_service_phone_numbers ) ) {
-                    $from_number = null;
-                    $messaging_service_phone_numbers_by_service = ( ( $service === 'sms' ) ? $messaging_service_phone_numbers['sms'] ?? [] : $messaging_service_phone_numbers['whatsapp'] ?? [] );
+                // Determine corresponding from number.
+                $from_number = self::get_messaging_service_phone_number( $messaging_service_id, $service );
 
-                    // Determine if an assigned number has been specified and fetch corresponding phone number.
-                    $assigned_numbers_id = self::get_option( ( ( $service === 'sms' ) ? self::$option_twilio_assigned_numbers_sms_id : self::$option_twilio_assigned_numbers_whatsapp_id ) );
-                    if ( !empty( $assigned_numbers_id ) ) {
-                        foreach ( $messaging_service_phone_numbers_by_service as $messaging_service_phone_number ) {
-                            if ( isset( $messaging_service_phone_number['id'] ) && !empty( $messaging_service_phone_number['number'] ) && ( $messaging_service_phone_number['id'] === $assigned_numbers_id ) ) {
-                                $from_number = $messaging_service_phone_number['number'];
-                            }
-                        }
+                // Only proceed, if a valid from number has been identified!
+                if ( !empty( $from_number ) ) {
+
+                    // Establish Twilio client session
+                    $twilio = new Client( self::get_option( self::$option_twilio_sid ), self::get_option( self::$option_twilio_token ) );
+
+                    // Determine service prefix.
+                    switch ( $service ) {
+                        case 'whatsapp':
+                            $service_prefix = 'whatsapp:';
+                            break;
+                        default:
+                            $service_prefix = ''; // Default to SMS
+                            break;
                     }
 
-                    // If $from_number is still empty, attempt to fetch the first available number!
-                    if ( empty( $from_number ) && !empty( $messaging_service_phone_numbers_by_service ) && isset( $messaging_service_phone_numbers_by_service[0]['id'], $messaging_service_phone_numbers_by_service[0]['number'] ) ) {
-                        $from_number = $messaging_service_phone_numbers_by_service[0]['number'];
-                    }
+                    // Prepare message options.
+                    $msg_opts = [
+                        'body' => $message,
+                        'from' => $service_prefix . $from_number,
+                        'messagingServiceSid' => $messaging_service_id
+                    ];
 
-                    // Only proceed, if a valid from number has been identified!
-                    if ( !empty( $from_number ) ) {
-
-                        // Establish Twilio client session
-                        $twilio = new Client( self::get_option( self::$option_twilio_sid ), self::get_option( self::$option_twilio_token ) );
-
-                        // Determine service prefix.
-                        switch ( $service ) {
-                            case 'whatsapp':
-                                $service_prefix = 'whatsapp:';
-                                break;
-                            default:
-                                $service_prefix = ''; // Default to SMS
-                                break;
-                        }
-
-                        // Prepare message options.
-                        $msg_opts = [
-                            'body' => $message,
-                            'from' => $service_prefix . $from_number,
-                            'messagingServiceSid' => $messaging_service_id
-                        ];
-
-                        // Dispatch message...!
-                        $message_result = $twilio->messages->create(
-                            $service_prefix . $phone_number,
-                            $msg_opts
-                        );
-                    }
+                    // Dispatch message...!
+                    $message_result = $twilio->messages->create(
+                        $service_prefix . $phone_number,
+                        $msg_opts
+                    );
                 }
             }
         } catch ( Exception $e ) {
             return false;
         }
 
-        return false;
+        return true;
+    }
+
+    public static function send_dt_notification_template( $phone_number, $template_variables, $template_id = 'dt_notifications' ): bool {
+        if ( ! self::has_credentials() ) {
+            return false;
+        }
+
+        // Ensure required params are present.
+        if ( empty( $template_id ) ) {
+            return false;
+        }
+
+        try {
+
+            // Determine corresponding content sid for specified template id.
+            $content_id = null;
+            $messaging_templates_settings = self::get_option( self::$option_twilio_messaging_templates, [] );
+            if ( !empty( $messaging_templates_settings[$template_id]['content_id'] ) ) {
+                $content_id = $messaging_templates_settings[$template_id]['content_id'];
+            }
+
+            // Ensure a valid messaging service id and content id, has been set.
+            $messaging_service_id = self::get_option( self::$option_twilio_msg_service_id );
+            if ( !empty( $messaging_service_id ) && !empty( $content_id ) ) {
+
+                // Determine corresponding from number.
+                $from_number = self::get_messaging_service_phone_number( $messaging_service_id );
+
+                // Only proceed, if a valid from number has been identified!
+                if ( !empty( $from_number ) ) {
+
+                    // Establish Twilio client session
+                    $twilio = new Client( self::get_option( self::$option_twilio_sid ), self::get_option( self::$option_twilio_token ) );
+
+                    // Default to whatsapp, for service prefix.
+                    $service_prefix = 'whatsapp:';
+
+                    // Prepare message options.
+                    $msg_opts = [
+                        'from' => $service_prefix . $from_number,
+                        'messagingServiceSid' => $messaging_service_id,
+                        'contentSid' => $content_id,
+                        'contentVariables' => json_encode( $template_variables )
+                    ];
+
+                    // Dispatch message...!
+                    $message_result = $twilio->messages->create(
+                        $service_prefix . $phone_number,
+                        $msg_opts
+                    );
+                }
+            }
+        } catch ( Exception $e ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function get_messaging_service_phone_number( $messaging_service_id, $service = 'whatsapp' ) {
+        if ( !empty( $messaging_service_id ) ) {
+
+            // List all numbers currently assigned to messaging service.
+            $messaging_service_phone_numbers = self::list_messaging_services_phone_numbers( $messaging_service_id );
+            if ( !empty( $messaging_service_phone_numbers ) ){
+                $from_number = null;
+                $messaging_service_phone_numbers_by_service = ( ( $service === 'sms' ) ? $messaging_service_phone_numbers['sms'] ?? [] : $messaging_service_phone_numbers['whatsapp'] ?? [] );
+
+                // Determine if an assigned number has been specified and fetch corresponding phone number.
+                $assigned_numbers_id = self::get_option( ( ( $service === 'sms' ) ? self::$option_twilio_assigned_numbers_sms_id : self::$option_twilio_assigned_numbers_whatsapp_id ) );
+                if ( !empty( $assigned_numbers_id ) ) {
+                    foreach ( $messaging_service_phone_numbers_by_service as $messaging_service_phone_number ) {
+                        if ( isset( $messaging_service_phone_number['id'] ) && !empty( $messaging_service_phone_number['number'] ) && ( $messaging_service_phone_number['id'] === $assigned_numbers_id ) ) {
+                            $from_number = $messaging_service_phone_number['number'];
+                        }
+                    }
+                }
+
+                // If $from_number is still empty, attempt to fetch the first available number!
+                if ( empty( $from_number ) && !empty( $messaging_service_phone_numbers_by_service ) && isset( $messaging_service_phone_numbers_by_service[0]['id'], $messaging_service_phone_numbers_by_service[0]['number'] ) ) {
+                    $from_number = $messaging_service_phone_numbers_by_service[0]['number'];
+                }
+
+                return $from_number;
+            }
+        }
+
+        return null;
     }
 
     public static function get_user_phone_numbers( $user ): array {
