@@ -205,6 +205,7 @@ function send_notification_on_channels( $user_id, $notification, $notification_t
 
             // Capture message and build associated link; ensuring to remove all embedded carriage returns.
             $message = str_replace( "\r\n", '', Disciple_Tools_Notifications::get_notification_message_html( $notification, false ) );
+            $message = str_replace( "\n", '', $message );
             $link = home_url( '/' ) . get_post_type( $post_id ) . '/' . $post_id;
 
             // Process sms channels.

@@ -98,7 +98,7 @@ class Disciple_Tools_Twilio_API {
                     ],
                     'types' => [
                         'twilio/text' => [
-                            'body' => 'Disciple.Tools Notification:\n\n {{1}}\n\n Open {{2}} to respond.'
+                            'body' => 'Disciple.Tools Notification:\n\n{{1}}\n\nOpen {{2}} to respond.'
                         ]
                     ]
                 ]
