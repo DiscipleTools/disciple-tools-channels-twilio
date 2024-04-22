@@ -5,7 +5,7 @@
  * Description: Disciple Tools - Channels - Twilio plugin; which captures settings enabling communication with target Twilio platform.
  * Text Domain: disciple-tools-channels-twilio
  * Domain Path: /languages
- * Version:  1.2.1
+ * Version:  1.3.0
  * Author URI: https://github.com/DiscipleTools
  * GitHub Plugin URI: https://github.com/DiscipleTools/disciple-tools-channels-twilio
  * Requires at least: 4.7.0
@@ -16,14 +16,6 @@
  * @link    https://github.com/DiscipleTools
  * @license GPL-2.0 or later
  *          https://www.gnu.org/licenses/gpl-2.0.html
- */
-
-/**
- * Refactoring (renaming) this plugin as your own:
- * 1. @todo Refactor all occurrences of the name Disciple_Tools_Plugin_Starter_Template, disciple_tools_plugin_starter_template, disciple-tools-plugin-starter-template, starter_post_type, and "Plugin Starter Template"
- * 2. @todo Rename the `disciple-tools-plugin-starter-template.php file.
- * 3. @todo Update the README.md and LICENSE
- * 4. @todo Update the default.pot file if you intend to make your plugin multilingual. Use a tool like POEdit
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -93,18 +85,10 @@ class Disciple_Tools_Channels_Twilio {
             require_once( 'rest-api/rest-api.php' );
         }
 
-        /**
-         * @todo Decide if you want to add a custom admin page in the admin area
-         * To remove: delete the 3 lines below and remove the folder named /admin
-         */
         if ( is_admin() ) {
             require_once( 'admin/admin-menu-and-tabs.php' ); // adds starter admin page and section for plugin
         }
 
-        /**
-         * @todo Decide if you want to customize links for your plugin in the plugin admin area
-         * To remove: delete the lines below and remove the function named
-         */
         if ( is_admin() ) { // adds links to the plugin description area in the plugin admin list.
             add_filter( 'plugin_row_meta', [ $this, 'plugin_description_links' ], 10, 4 );
         }
@@ -128,8 +112,7 @@ class Disciple_Tools_Channels_Twilio {
         if ( strpos( $plugin_file_name, basename( __FILE__ ) ) ) {
             // You can still use `array_unshift()` to add links at the beginning.
 
-            $links_array[] = '<a href="https://disciple.tools">Disciple.Tools Community</a>'; // @todo replace with your links.
-            // @todo add other links here
+            $links_array[] = '<a href="https://community.disciple.tools">Disciple.Tools Community</a>';
         }
 
         return $links_array;
@@ -273,20 +256,6 @@ if ( ! function_exists( 'dt_hook_ajax_notice_handler' ) ) {
     }
 }
 
-/**
- * Plugin Releases and updates
- * @todo Uncomment and change the url if you want to support remote plugin updating with new versions of your plugin
- * To remove: delete the section of code below and delete the file called version-control.json in the plugin root
- *
- * This section runs the remote plugin updating service, so you can issue distributed updates to your plugin
- *
- * @note See the instructions for version updating to understand the steps involved.
- * @link https://github.com/DiscipleTools/disciple-tools-channels-twilio/wiki/Configuring-Remote-Updating-System
- *
- * @todo Enable this section with your own hosted file
- * @todo An example of this file can be found in (version-control.json)
- * @todo Github is a good option for delivering static json.
- */
 /**
  * Check for plugin updates even when the active theme is not Disciple.Tools
  *
