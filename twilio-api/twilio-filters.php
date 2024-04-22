@@ -215,9 +215,11 @@ function send_notification_on_channels( $user_id, $notification, $notification_t
 
             // Process whatsapp channels.
             if ( $whatsapp_enabled && isset( $user_meta[$whatsapp_channel_notification_key] ) && ( boolval( $user_meta[$whatsapp_channel_notification_key][0] ) === true ) ) {
+                $site_name = get_bloginfo( 'name' );
                 $sent = Disciple_Tools_Twilio_API::send_dt_notification_template( $phone_number, [
-                    '1' => $message,
-                    '2' => $link
+                    '1' => $site_name,
+                    '2' => $message,
+                    '3' => $link
                 ] );
             }
         }

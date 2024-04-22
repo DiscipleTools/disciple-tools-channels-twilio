@@ -93,12 +93,13 @@ class Disciple_Tools_Twilio_API {
                     'friendly_name' => 'D.T Notifications',
                     'language' => 'en',
                     'variables' => [
-                        '1' => 'John mentioned you on contact Bob saying: @Jared, can you respond?',
-                        '2' => 'http://example.com/contact/123/'
+                        '1' => 'Disciple Tools',
+                        '2' => 'John mentioned you on contact Bob saying: @Jared, can you respond?',
+                        '3' => 'http://example.com/contact/123/'
                     ],
                     'types' => [
                         'twilio/text' => [
-                            'body' => 'Disciple.Tools Notification:\n\n{{1}}\n\nOpen {{2}} to respond.'
+                            'body' => 'You received a notification on {{1}}.\n\nHere is the message: {{2}}.\n\nPlease open {{3}} to respond.'
                         ]
                     ]
                 ]
