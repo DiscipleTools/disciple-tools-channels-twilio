@@ -6,6 +6,7 @@ Send SMS and WhatsApp messages or Disciple.Tools notifications using Twilio.
 
 ## Pre-requisites
 A [Twilio Account](https://www.twilio.com/) setup with a phone number and [messaging service](https://github.com/DiscipleTools/disciple-tools-channels-twilio/wiki/Getting-Started-With-Twilio-Messaging-Services) set up.
+
 To use WhatsApp you'll need a [Whatsapp Sender](https://www.twilio.com/docs/whatsapp/self-sign-up) linked to one of your twilio phone numbers.
 
 See setup instructions in the [wiki](https://github.com/DiscipleTools/disciple-tools-channels-twilio/wiki).
@@ -20,6 +21,12 @@ See setup instructions in the [wiki](https://github.com/DiscipleTools/disciple-t
 #### API Usage
 
 The Disciple Tools - Channels - Twilio plugin can be decoupled, so as to work independently of the Disciple Tools - Magic Links plugin; in order to send messages directly.
+
+
+```php
+//check if twilio is setup and configured
+dt_twilio_configured()
+```
 
 Send as sms to a number.
 Returns a boolean value indicating if the message was sent successfully.
@@ -36,16 +43,12 @@ Disciple_Tools_Twilio_API::send_whatsapp( $phone_number, $message );
 
 Send a message to a D.T User
 ```php
-if ( dt_twilio_configured() ) {
-    $bool_result = dt_twilio_direct_send( 12, 'wp_user', $msg, [ 'service' => 'sms' ] );
-}
+$bool_result = dt_twilio_direct_send( 12, 'wp_user', $msg, [ 'service' => 'sms' ] );
 ```
 
 Send a message to a D.T Contact
 ```php
-if ( dt_twilio_configured() ) {
-    $bool_result = dt_twilio_direct_send( 343, 'post', $msg, [ 'service' => 'sms' ] );
-}
+$bool_result = dt_twilio_direct_send( 343, 'post', $msg, [ 'service' => 'sms' ] );
 ```
 
 - __id:__ Assigned WP user id or post id, depending on type value.
