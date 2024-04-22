@@ -10,6 +10,9 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
 
     public function __construct() {
 
+        // First, handle update submissions
+        $this->process_updates();
+
         // Load scripts and styles
         wp_enqueue_script( 'dt_channels_twilio_general_script', plugin_dir_url( __FILE__ ) . 'js/general-tab.js', [
             'jquery',
@@ -17,12 +20,12 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
         ], filemtime( dirname( __FILE__ ) . '/js/general-tab.js' ), true );
         wp_localize_script(
             'dt_channels_twilio_general_script', 'dt_channels_twilio', array(
-                't_b_c' => []
+                'dt_endpoint_list_phone_numbers' => Disciple_Tools_Twilio_API::fetch_endpoint_list_phone_numbers_url(),
+                'dt_endpoint_template_actions' => Disciple_Tools_Twilio_API::fetch_endpoint_template_actions_url(),
+                'assigned_numbers_sms_id' => Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_assigned_numbers_sms_id ),
+                'assigned_numbers_whatsapp_id' => Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_assigned_numbers_whatsapp_id )
             )
         );
-
-        // First, handle update submissions
-        $this->process_updates();
     }
 
     private function process_updates() {
@@ -41,6 +44,18 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
             }
             if ( isset( $_POST['twilio_main_col_manage_form_msg_service_id'] ) ) {
                 Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_msg_service_id, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_msg_service_id'] ) ) );
+            }
+            if ( isset( $_POST['twilio_main_col_manage_form_msg_service_assigned_numbers_sms_id'] ) ) {
+                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_assigned_numbers_sms_id, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_msg_service_assigned_numbers_sms_id'] ) ) );
+            }
+            if ( isset( $_POST['twilio_main_col_manage_form_msg_service_assigned_numbers_whatsapp_id'] ) ) {
+                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_assigned_numbers_whatsapp_id, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_msg_service_assigned_numbers_whatsapp_id'] ) ) );
+            }
+            if ( isset( $_POST['twilio_main_col_manage_form_service_sms_enabled'] ) ) {
+                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_service_sms_enabled, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_service_sms_enabled'] ) ) );
+            }
+            if ( isset( $_POST['twilio_main_col_manage_form_service_whatsapp_enabled'] ) ) {
+                Disciple_Tools_Twilio_API::set_option( Disciple_Tools_Twilio_API::$option_twilio_service_whatsapp_enabled, sanitize_text_field( wp_unslash( $_POST['twilio_main_col_manage_form_service_whatsapp_enabled'] ) ) );
             }
         }
     }
@@ -85,6 +100,24 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
             <tr>
                 <td>
                     <?php $this->main_column_management(); ?>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <br>
+        <!-- End Box -->
+
+        <!-- Box -->
+        <table class="widefat striped">
+            <thead>
+            <tr>
+                <th>Assigned Telephone Numbers</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    <?php $this->main_column_assigned_numbers(); ?>
                 </td>
             </tr>
             </tbody>
@@ -155,7 +188,7 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                 </td>
             </tr>
             <tr>
-                <td style="vertical-align: middle;">Service Type [<a href="#" class="twilio-docs"
+                <td style="vertical-align: middle;">Default Service Type [<a href="#" class="twilio-docs"
                                                                 data-title="twilio_right_docs_title_service"
                                                                 data-content="twilio_right_docs_content_service">&#63;</a>]
                 </td>
@@ -197,7 +230,7 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
         <br>
         <span style="float:right;">
             <button type="submit" id="twilio_main_col_manage_update"
-                    class="button float-right"><?php esc_html_e( 'Update', 'disciple_tools' ) ?></button>
+                    class="button float-right twilio-main-col-update"><?php esc_html_e( 'Update', 'disciple_tools' ) ?></button>
         </span>
 
         <!-- [Submission Form] -->
@@ -219,7 +252,91 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
 
             <input type="hidden" value="" id="twilio_main_col_manage_form_msg_service_id"
                    name="twilio_main_col_manage_form_msg_service_id"/>
+
+            <input type="hidden" value="" id="twilio_main_col_manage_form_msg_service_assigned_numbers_sms_id"
+                   name="twilio_main_col_manage_form_msg_service_assigned_numbers_sms_id"/>
+
+            <input type="hidden" value="" id="twilio_main_col_manage_form_msg_service_assigned_numbers_whatsapp_id"
+                   name="twilio_main_col_manage_form_msg_service_assigned_numbers_whatsapp_id"/>
+
+            <input type="hidden" value="" id="twilio_main_col_manage_form_service_sms_enabled"
+                   name="twilio_main_col_manage_form_service_sms_enabled"/>
+
+            <input type="hidden" value="" id="twilio_main_col_manage_form_service_whatsapp_enabled"
+                   name="twilio_main_col_manage_form_service_whatsapp_enabled"/>
         </form>
+        <?php
+    }
+
+    private function main_column_assigned_numbers() {
+        ?>
+        <div class="wrap">
+            <nav class="nav-tab-wrapper wp-clearfix">
+                <a id="twilio_main_col_assigned_numbers_sms_tab" href="#"
+                   class="numbers-nav-tab nav-tab nav-tab-active"
+                   data-number_type="sms">SMS</a>
+                <a id="twilio_main_col_assigned_numbers_whatsapp_tab" href="#"
+                   class="numbers-nav-tab nav-tab"
+                   data-number_type="whatsapp">WhatsApp</a>
+            </nav>
+            <br>
+            <div id="twilio_main_col_assigned_numbers_tab_content" class="numbers-nav-tab-content">
+                <span id="twilio_main_col_assigned_numbers_tab_content_spinner" class="loading-spinner active" style="display: none;"></span>
+                <span id="twilio_main_col_assigned_numbers_tab_content_msg" style="display: none;"></span>
+
+                <div id="twilio_main_col_assigned_numbers_tab_content_sms" class="numbers-nav-tab-content" style="display: none;">
+                    <table class="widefat striped">
+                        <tr>
+                            <td style="vertical-align: middle;">D.T Site Notifications Enabled</td>
+                            <td>
+                                <?php $sms_enabled = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_service_sms_enabled, false ); ?>
+                                <input type="checkbox"
+                                       id="twilio_main_col_assigned_numbers_sms_notify_enabled" <?php echo esc_attr( $sms_enabled ? 'checked' : '' ); ?> />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align: middle;">Phone Numbers</td>
+                            <td>
+                                <select id="twilio_main_col_assigned_numbers_sms_select" style="min-width: 100%;"></select>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div id="twilio_main_col_assigned_numbers_tab_content_whatsapp" class="numbers-nav-tab-content" style="display: none;">
+                    <table class="widefat striped">
+                        <tr>
+                            <td style="vertical-align: middle;">D.T Site Notifications Enabled</td>
+                            <td>
+                                <?php $whatsapp_enabled = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_service_whatsapp_enabled, false ); ?>
+                                <input type="checkbox"
+                                       id="twilio_main_col_assigned_numbers_whatsapp_notify_enabled" <?php echo esc_attr( $whatsapp_enabled ? 'checked' : '' ); ?> />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align: middle;">Phone Numbers</td>
+                            <td>
+                                <select id="twilio_main_col_assigned_numbers_whatsapp_select" style="min-width: 100%;"></select>
+                            </td>
+                        </tr>
+                        <!--<tr>
+                            <td style="vertical-align: middle;">Templates</td>
+                            <td>
+                                <button id="twilio_main_col_assigned_numbers_whatsapp_templates_upload_all" class="button">Upload All</button>
+                                <button id="twilio_main_col_assigned_numbers_whatsapp_templates_submit_all" class="button">Submit All For Approval</button>
+                                <br>
+                                <span id="twilio_main_col_assigned_numbers_whatsapp_templates_message" style="display: none; margin-top: 5px;"></span>
+                            </td>
+                        </tr>-->
+                    </table>
+                </div>
+            </div>
+        </div>
+        <br>
+        <span style="float:right;">
+            <button type="submit" id="twilio_main_col_assigned_numbers_update"
+                    class="button float-right twilio-main-col-update"><?php esc_html_e( 'Update', 'disciple_tools' ) ?></button>
+        </span>
         <?php
     }
 }

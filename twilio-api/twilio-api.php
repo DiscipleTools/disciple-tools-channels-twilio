@@ -18,8 +18,33 @@ class Disciple_Tools_Twilio_API {
     public static $option_twilio_sid = 'dt_twilio_sid';
     public static $option_twilio_token = 'dt_twilio_token';
     public static $option_twilio_service = 'dt_twilio_service';
+    public static $option_twilio_service_sms_enabled = 'dt_twilio_service_sms_enabled';
+    public static $option_twilio_service_whatsapp_enabled = 'dt_twilio_service_whatsapp_enabled';
     public static $option_twilio_msg_service_id = 'dt_twilio_msg_service_id';
     public static $option_twilio_number_id = 'dt_twilio_number_id';
+    public static $option_twilio_assigned_numbers_sms_id = 'dt_twilio_assigned_numbers_sms_id';
+    public static $option_twilio_assigned_numbers_whatsapp_id = 'dt_twilio_assigned_numbers_whatsapp_id';
+    public static $option_twilio_messaging_templates = 'dt_twilio_messaging_templates';
+
+    public static function fetch_endpoint_list_phone_numbers_url(): string {
+        return trailingslashit( site_url() ) . 'wp-json/disciple_tools_channels_twilio/v1/list_phone_numbers';
+    }
+
+    public static function fetch_endpoint_upload_messaging_template_url(): string {
+        return trailingslashit( site_url() ) . 'wp-json/disciple_tools_channels_twilio/v1/upload_messaging_template';
+    }
+
+    public static function fetch_endpoint_submit_messaging_template_url(): string {
+        return trailingslashit( site_url() ) . 'wp-json/disciple_tools_channels_twilio/v1/submit_messaging_template';
+    }
+
+    public static function fetch_endpoint_reset_messaging_template_url(): string {
+        return trailingslashit( site_url() ) . 'wp-json/disciple_tools_channels_twilio/v1/reset_messaging_template';
+    }
+
+    public static function fetch_endpoint_template_actions_url(): string {
+        return trailingslashit( site_url() ) . 'wp-json/disciple_tools_channels_twilio/v1/template_actions';
+    }
 
     public static function is_enabled(): bool {
         $enabled = get_option( self::$option_twilio_enabled );
@@ -35,12 +60,12 @@ class Disciple_Tools_Twilio_API {
         return ! empty( get_option( $option ) );
     }
 
-    public static function get_option( $option ): string {
-        return get_option( $option );
+    public static function get_option( $option, $default_value = null ) {
+        return get_option( $option, $default_value );
     }
 
-    public static function set_option( $option, $value ) {
-        update_option( $option, $value );
+    public static function set_option( $option, $value ): bool {
+        return update_option( $option, $value );
     }
 
     public static function list_services(): array {
@@ -56,7 +81,240 @@ class Disciple_Tools_Twilio_API {
         ];
     }
 
-    public static function list_phone_numbers(): array {
+    public static function list_messaging_templates(): array {
+        $messaging_templates = [
+            'dt_notifications' => [
+                'id' => 'dt_notifications',
+                'name' => 'D.T Notifications',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => 'D.T Notifications',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => 'Disciple Tools',
+                        '2' => 'John mentioned you on contact Bob saying: @Jared, can you respond?',
+                        '3' => 'http://example.com/contact/123/'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => 'You received a notification on {{1}}.\n\nHere is the message: {{2}}.\n\nPlease open {{3}} to respond.'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        return apply_filters( 'dt_twilio_messaging_templates', $messaging_templates );
+    }
+
+    public static function list_messaging_templates_statuses( $args = [] ): array {
+        if ( ! self::has_credentials() ) {
+            return [];
+        }
+
+        $templates = [];
+
+        try {
+
+            // As there does not seem to be a Twilio API for this operation, a raw HTTP GET request shall be constructed.
+            $url = 'https://content.twilio.com/v1/ContentAndApprovals';
+            $options = [
+                'http' => [
+                    'header' => [
+                        'Content-Type: application/json',
+                        'Authorization: Basic ' . base64_encode( self::get_option( self::$option_twilio_sid, '' ) .':'. self::get_option( self::$option_twilio_token, '' ) )
+                    ],
+                    'method' => 'GET',
+                    'content' => ''
+                ]
+            ];
+
+            $context = stream_context_create( $options );
+            $response = file_get_contents( $url, false, $context );
+
+            if ( !empty( $response ) && !is_wp_error( $response ) ) {
+                $content_and_approvals = json_decode( $response, true );
+                if ( ! empty( $content_and_approvals ) ) {
+                    $messaging_templates = self::list_messaging_templates();
+                    foreach ( $content_and_approvals['contents'] ?? [] as $content ) {
+
+                        // Capture content template details
+                        if ( isset( $content['sid'] ) ) {
+                            $details = [
+                                'id' => $content['sid'],
+                                'name' => $content['friendly_name'] ?? ''
+                            ];
+
+                            if ( isset( $content['approval_requests'] ) ) {
+                                $details['approval_status'] = [
+                                    'name' => $content['approval_requests']['name'] ?? '',
+                                    'status' => $content['approval_requests']['status'] ?? '',
+                                    'rejection_reason' => $content['approval_requests']['rejection_reason'] ?? '',
+                                    'category' => $content['approval_requests']['category'] ?? '',
+                                    'content_type' => $content['approval_requests']['content_type'] ?? ''
+                                ];
+                            }
+
+                            $templates[ $content['sid'] ] = $details;
+
+                            // If specified, avoid duplicates, by ensuring remotely created template ids, are kept in sync with local settings.
+                            if ( isset( $args['avoid_duplicates'] ) && $args['avoid_duplicates'] ) {
+                                foreach ( $messaging_templates as $template_id => $template ) {
+                                    if ( $template['name'] === $details['name'] ) {
+                                        $messaging_templates_settings = self::get_option( self::$option_twilio_messaging_templates, [] );
+                                        if ( !isset( $messaging_templates_settings[$template_id], $messaging_templates_settings[$template_id]['content_id'] ) || ( $messaging_templates_settings[$template_id]['content_id'] !== $details['id'] ) ) {
+                                            $messaging_templates_settings[$template_id]['content_id'] = $details['id'];
+                                            self::set_option( self::$option_twilio_messaging_templates, $messaging_templates_settings );
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch ( Exception $e ) {
+            dt_write_log( $e );
+            return [];
+        }
+
+        return $templates;
+    }
+
+    public static function upload_messaging_template( $template_id ) {
+        if ( ! self::has_credentials() ) {
+            return null;
+        }
+
+        // Fetch corresponding template and ensure it's enabled and ready for business! ;-)
+        $messaging_templates = self::list_messaging_templates();
+        if ( isset( $messaging_templates[ $template_id ] ) && $messaging_templates[ $template_id ]['enabled'] && !empty( $messaging_templates[ $template_id ]['content_template'] ) ) {
+            try {
+
+                // As there does not seem to be a Twilio API for this operation, a raw HTTP POST request shall be constructed.
+                $url = 'https://content.twilio.com/v1/Content';
+                $options = [
+                    'http' => [
+                        'header' => [
+                            'Content-Type: application/json',
+                            'Authorization: Basic ' . base64_encode( self::get_option( self::$option_twilio_sid, '' ) .':'. self::get_option( self::$option_twilio_token, '' ) )
+                        ],
+                        'method' => 'POST',
+                        'content' => json_encode( $messaging_templates[ $template_id ]['content_template'] )
+                    ]
+                ];
+
+                $context = stream_context_create( $options );
+                $response = file_get_contents( $url, false, $context );
+
+                if ( !empty( $response ) && !is_wp_error( $response ) ) {
+                    $content = json_decode( $response, true );
+
+                    if ( !empty( $content['sid'] ) ) {
+                        return $content['sid'];
+                    }
+                }
+            } catch ( Exception $e ) {
+                dt_write_log( $e );
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    public static function submit_messaging_template( $template_id ): bool {
+        if ( !self::has_credentials() ) {
+            return false;
+        }
+
+        // Fetch corresponding template and ensure it's enabled and ready for business! ;-)
+        $messaging_templates = self::list_messaging_templates();
+        $messaging_templates_settings = self::get_option( self::$option_twilio_messaging_templates, [] );
+        if ( isset( $messaging_templates[ $template_id ] ) && $messaging_templates[ $template_id ]['enabled'] && !empty( $messaging_templates[ $template_id ]['content_template'] ) && isset( $messaging_templates_settings[ $template_id ]['content_id'] ) ) {
+            try {
+
+                $content_id = $messaging_templates_settings[ $template_id ]['content_id'];
+                $messaging_template = $messaging_templates[ $template_id ];
+
+                // Generate a name, based on template_id; ensuring structure adheres to approval request requirements - Only lowercase alphanumeric characters or underscores.
+                $content_name = trim( strtolower( str_replace( ' ', '_', $template_id ) ) );
+
+                // As there does not seem to be a Twilio API for this operation, a raw HTTP POST request shall be constructed.
+                $url = 'https://content.twilio.com/v1/Content/' . $content_id . '/ApprovalRequests/whatsapp';
+                $options = [
+                    'http' => [
+                        'header' => [
+                            'Content-Type: application/json',
+                            'Authorization: Basic ' . base64_encode( self::get_option( self::$option_twilio_sid, '' ) .':'. self::get_option( self::$option_twilio_token, '' ) )
+                        ],
+                        'method' => 'POST',
+                        'content' => json_encode( [
+                            'name' => $content_name,
+                            'category' => $messaging_template['content_category'] ?? 'UTILITY'
+                        ] )
+                    ]
+                ];
+
+                $context = stream_context_create( $options );
+                $response = file_get_contents( $url, false, $context );
+
+                if ( !empty( $response ) && !is_wp_error( $response ) ) {
+                    $approval = json_decode( $response, true );
+                    return ( !empty( $approval['status'] ) && in_array( $approval['status'], [ 'received' ] ) );
+                }
+            } catch ( Exception $e ) {
+                dt_write_log( $e );
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    public static function delete_messaging_template( $template_id ): bool {
+        if ( !self::has_credentials() ) {
+            return false;
+        }
+
+        // Fetch corresponding template and ensure it's enabled and ready for business! ;-)
+        $messaging_templates = self::list_messaging_templates();
+        $messaging_templates_settings = self::get_option( self::$option_twilio_messaging_templates, [] );
+        if ( isset( $messaging_templates[ $template_id ] ) && $messaging_templates[ $template_id ]['enabled'] && isset( $messaging_templates_settings[ $template_id ]['content_id'] ) ) {
+            try {
+
+                $content_id = $messaging_templates_settings[ $template_id ]['content_id'];
+
+                // As there does not seem to be a Twilio API for this operation, a raw HTTP DELETE request shall be constructed.
+                $url = 'https://content.twilio.com/v1/Content/' . $content_id;
+                $options = [
+                    'http' => [
+                        'header' => [
+                            'Content-Type: application/json',
+                            'Authorization: Basic ' . base64_encode( self::get_option( self::$option_twilio_sid, '' ) .':'. self::get_option( self::$option_twilio_token, '' ) )
+                        ],
+                        'method' => 'DELETE',
+                        'content' => ''
+                    ]
+                ];
+
+                $context = stream_context_create( $options );
+                $response = file_get_contents( $url, false, $context );
+
+                return ! is_wp_error( $response );
+
+            } catch ( Exception $e ) {
+                dt_write_log( $e );
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    public static function list_incoming_phone_numbers(): array {
         if ( ! self::has_credentials() ) {
             return [];
         }
@@ -94,6 +352,62 @@ class Disciple_Tools_Twilio_API {
         }
 
         return $phone_numbers;
+    }
+
+    public static function list_messaging_services_phone_numbers( $sid ): array {
+        if ( ! self::has_credentials() ) {
+            return [];
+        }
+
+        $phone_numbers_sms = [];
+        $phone_numbers_whatsapp = [];
+
+        try {
+
+            // Establish Twilio client session
+            $twilio = new Client( self::get_option( self::$option_twilio_sid ), self::get_option( self::$option_twilio_token ) );
+
+            // Fetch available incoming phone numbers
+            // phpcs:disable
+            $incoming_phone_numbers = $twilio->messaging->v1->services( $sid )->phoneNumbers->read( 20 );
+            // phpcs:enable
+
+            // Iterate over results
+            if ( ! empty( $incoming_phone_numbers ) ) {
+                foreach ( $incoming_phone_numbers as $number ) {
+
+                    // phpcs:disable
+                    if ( isset( $number->sid, $number->phoneNumber ) ) {
+                        $capture = false;
+
+                        // Capture accordingly, based on service type grouping!
+                        if ( in_array( 'SMS', $number->capabilities ?? [] ) || in_array( 'MMS', $number->capabilities ?? [] ) ) {
+                            $phone_numbers_sms[] = [
+                                'id'     => $number->sid,
+                                'number' => $number->phoneNumber,
+                                'name'   => $number->phoneNumber . ( !empty( $number->countryCode ) ? ' ['. $number->countryCode .']' : '' )
+                            ];
+                        }
+
+                        if ( in_array( 'Voice', $number->capabilities ?? [] ) ) {
+                            $phone_numbers_whatsapp[] = [
+                                'id'     => $number->sid,
+                                'number' => $number->phoneNumber,
+                                'name'   => $number->phoneNumber . ( !empty( $number->countryCode ) ? ' ['. $number->countryCode .']' : '' )
+                            ];
+                        }
+                    }
+                    // phpcs:enable
+                }
+            }
+        } catch ( Exception $e ) {
+            return [];
+        }
+
+        return [
+            'sms' => $phone_numbers_sms,
+            'whatsapp' => $phone_numbers_whatsapp
+        ];
     }
 
     public static function list_messaging_services(): array {
@@ -173,6 +487,32 @@ class Disciple_Tools_Twilio_API {
                         break;
                 }
 
+                // Prepare message options.
+                $msg_opts = [
+                    'body' => $message,
+                    'messagingServiceSid' => $messaging_service->sid
+                ];
+
+                $assigned_numbers_id = self::get_option( ( ( $current_service === 'sms' ) ? self::$option_twilio_assigned_numbers_sms_id : self::$option_twilio_assigned_numbers_whatsapp_id ) );
+                if ( !empty( $assigned_numbers_id ) ) {
+
+                    try {
+
+                        // phpcs:disable
+                        $phone_number = $twilio->messaging->v1->services( $messaging_service->sid )
+                            ->phoneNumbers( $assigned_numbers_id )
+                            ->fetch();
+
+                        if ( !empty( $phone_number->phoneNumber ) ) {
+                            $msg_opts['from'] = $service . $phone_number->phoneNumber;
+                        }
+                        // phpcs:enable
+
+                    } catch ( Exception $e_numbers ) {
+                        dt_write_log( $e_numbers );
+                    }
+                }
+
                 // Iterate over phone numbers
                 foreach ( $phone_numbers as $phone ) {
                     if ( ! empty( $phone ) ) {
@@ -180,10 +520,7 @@ class Disciple_Tools_Twilio_API {
                         // Dispatch message...!
                         $message_result = $twilio->messages->create(
                             $service . $phone,
-                            [
-                                'body'                => $message,
-                                'messagingServiceSid' => $messaging_service->sid
-                            ]
+                            $msg_opts
                         );
                     }
                 }
@@ -196,6 +533,158 @@ class Disciple_Tools_Twilio_API {
         }
 
         return false;
+    }
+
+    public static function send_sms( $phone_number, $message ): bool {
+        return self::send_by_service( 'sms', $phone_number, $message );
+    }
+
+    public static function send_whatsapp( $phone_number, $message ): bool {
+        return self::send_by_service( 'whatsapp', $phone_number, $message );
+    }
+
+    private static function send_by_service( $service, $phone_number, $message ): bool {
+        if ( ! self::has_credentials() ) {
+            return false;
+        }
+
+        // Ensure required params are present.
+        if ( empty( $service ) || empty( $phone_number ) || empty( $message ) ) {
+            return false;
+        }
+
+        try {
+
+            // Ensure a valid messaging service id has been set.
+            $messaging_service_id = self::get_option( self::$option_twilio_msg_service_id );
+            if ( !empty( $messaging_service_id ) ) {
+
+                // Determine corresponding from number.
+                $from_number = self::get_messaging_service_phone_number( $messaging_service_id, $service );
+
+                // Only proceed, if a valid from number has been identified!
+                if ( !empty( $from_number ) ) {
+
+                    // Establish Twilio client session
+                    $twilio = new Client( self::get_option( self::$option_twilio_sid ), self::get_option( self::$option_twilio_token ) );
+
+                    // Determine service prefix.
+                    switch ( $service ) {
+                        case 'whatsapp':
+                            $service_prefix = 'whatsapp:';
+                            break;
+                        default:
+                            $service_prefix = ''; // Default to SMS
+                            break;
+                    }
+
+                    // Prepare message options.
+                    $msg_opts = [
+                        'body' => $message,
+                        'from' => $service_prefix . $from_number,
+                        'messagingServiceSid' => $messaging_service_id
+                    ];
+
+                    // Dispatch message...!
+                    $message_result = $twilio->messages->create(
+                        $service_prefix . $phone_number,
+                        $msg_opts
+                    );
+                }
+            }
+        } catch ( Exception $e ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function send_dt_notification_template( $phone_number, $template_variables, $template_id = 'dt_notifications' ): bool {
+        if ( ! self::has_credentials() ) {
+            return false;
+        }
+
+        // Ensure required params are present.
+        if ( empty( $template_id ) ) {
+            return false;
+        }
+
+        try {
+
+            // Determine corresponding content sid for specified template id.
+            $content_id = null;
+            $messaging_templates_settings = self::get_option( self::$option_twilio_messaging_templates, [] );
+            if ( !empty( $messaging_templates_settings[$template_id]['content_id'] ) ) {
+                $content_id = $messaging_templates_settings[$template_id]['content_id'];
+            }
+
+            // Ensure a valid messaging service id and content id, has been set.
+            $messaging_service_id = self::get_option( self::$option_twilio_msg_service_id );
+            if ( !empty( $messaging_service_id ) && !empty( $content_id ) ) {
+
+                // Determine corresponding from number.
+                $from_number = self::get_messaging_service_phone_number( $messaging_service_id );
+
+                // Only proceed, if a valid from number has been identified!
+                if ( !empty( $from_number ) ) {
+
+                    // Establish Twilio client session
+                    $twilio = new Client( self::get_option( self::$option_twilio_sid ), self::get_option( self::$option_twilio_token ) );
+
+                    // Default to whatsapp, for service prefix.
+                    $service_prefix = 'whatsapp:';
+
+                    // Prepare message options.
+                    $msg_opts = [
+                        'from' => $service_prefix . $from_number,
+                        'messagingServiceSid' => $messaging_service_id,
+                        'contentSid' => $content_id,
+                        'contentVariables' => json_encode( $template_variables )
+                    ];
+
+                    // Dispatch message...!
+                    $message_result = $twilio->messages->create(
+                        $service_prefix . $phone_number,
+                        $msg_opts
+                    );
+                }
+            }
+        } catch ( Exception $e ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function get_messaging_service_phone_number( $messaging_service_id, $service = 'whatsapp' ) {
+        if ( !empty( $messaging_service_id ) ) {
+
+            // List all numbers currently assigned to messaging service.
+            $messaging_service_phone_numbers = self::list_messaging_services_phone_numbers( $messaging_service_id );
+            if ( !empty( $messaging_service_phone_numbers ) ){
+                $from_number = null;
+                $messaging_service_phone_numbers_by_service = ( ( $service === 'sms' ) ? $messaging_service_phone_numbers['sms'] ?? [] : $messaging_service_phone_numbers['whatsapp'] ?? [] );
+
+                // Determine if an assigned number has been specified and fetch corresponding phone number.
+                $assigned_numbers_id = self::get_option( ( ( $service === 'sms' ) ? self::$option_twilio_assigned_numbers_sms_id : self::$option_twilio_assigned_numbers_whatsapp_id ) );
+                if ( !empty( $assigned_numbers_id ) ) {
+                    foreach ( $messaging_service_phone_numbers_by_service as $messaging_service_phone_number ) {
+                        if ( isset( $messaging_service_phone_number['id'] ) && !empty( $messaging_service_phone_number['number'] ) && ( $messaging_service_phone_number['id'] === $assigned_numbers_id ) ) {
+                            $from_number = $messaging_service_phone_number['number'];
+                        }
+                    }
+                }
+
+                // If $from_number is still empty, attempt to fetch the first available number!
+                if ( empty( $from_number ) && !empty( $messaging_service_phone_numbers_by_service ) && isset( $messaging_service_phone_numbers_by_service[0]['id'], $messaging_service_phone_numbers_by_service[0]['number'] ) ) {
+                    $from_number = $messaging_service_phone_numbers_by_service[0]['number'];
+                }
+
+                return $from_number;
+            }
+        }
+
+        return null;
     }
 
     public static function get_user_phone_numbers( $user ): array {

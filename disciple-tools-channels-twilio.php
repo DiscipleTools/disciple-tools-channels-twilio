@@ -88,6 +88,11 @@ class Disciple_Tools_Channels_Twilio {
 
     private function __construct() {
         $is_rest = dt_is_rest();
+
+        if ( $is_rest && strpos( dt_get_url_path(), 'disciple_tools_channels_twilio' ) !== false ) {
+            require_once( 'rest-api/rest-api.php' );
+        }
+
         /**
          * @todo Decide if you want to add a custom admin page in the admin area
          * To remove: delete the 3 lines below and remove the folder named /admin
