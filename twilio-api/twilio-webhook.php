@@ -64,17 +64,17 @@ class Disciple_Tools_Twilio_Rest
             return false;
         }
 
-        $type = str_contains( $params['From'], 'whatsapp' ) ? 'whatsapp' : 'phone';
+        $type = str_contains( $params['From'], 'whatsapp' ) ? 'whatsapp' : 'sms';
 
         if ( class_exists( 'DT_Conversations_API' ) ) {
 
             $conversations_record = DT_Conversations_API::create_or_update_conversation_record(
                 $params['From'],
-                [ 'type' => $type ],
+                [ 'type' => 'phone' ],
             );
             if ( !is_wp_error( $conversations_record ) ){
                 #DT_Posts::add_post_comment( 'conversations', $conversations_record['ID'], $phone_number_location, 'twilio', [], false, true );
-                DT_Posts::add_post_comment( 'conversations', $conversations_record['ID'], $params['Body'], 'twilio', [], false, false );
+                DT_Posts::add_post_comment( 'conversations', $conversations_record['ID'], $params['Body'], $type, [], false, false );
 
 
                 do_action( 'dt_twilio_message_received', $type, $params, $conversations_record['ID'] );
