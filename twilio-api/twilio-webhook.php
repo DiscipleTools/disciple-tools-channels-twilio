@@ -74,7 +74,10 @@ class Disciple_Tools_Twilio_Rest
             );
             if ( !is_wp_error( $conversations_record ) ){
                 #DT_Posts::add_post_comment( 'conversations', $conversations_record['ID'], $phone_number_location, 'twilio', [], false, true );
-                DT_Posts::add_post_comment( 'conversations', $conversations_record['ID'], $params['Body'], $type, [], false, false );
+                DT_Posts::add_post_comment( 'conversations', $conversations_record['ID'], $params['Body'], $type, [
+                    'user_id'        => 0,
+                    'comment_author' => DT_Conversations_API::validate_and_format_phone( $params['From'] ),
+                ], false, false );
 
 
                 do_action( 'dt_twilio_message_received', $type, $params, $conversations_record['ID'] );
