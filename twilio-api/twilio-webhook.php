@@ -69,7 +69,7 @@ class Disciple_Tools_Twilio_Rest
         if ( class_exists( 'DT_Conversations_API' ) ) {
 
             $conversations_record = DT_Conversations_API::create_or_update_conversation_record(
-                $params['From'],
+                DT_Conversations_API::validate_and_format_phone( $params['From'] ),
                 [ 'type' => 'phone' ],
             );
             if ( !is_wp_error( $conversations_record ) ){
