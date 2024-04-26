@@ -178,45 +178,45 @@ function dt_communication_channels( $channels ) {
 
 add_action( 'send_notification_on_channels', 'send_notification_on_channels', 10, 4 );
 function send_notification_on_channels( $user_id, $notification, $notification_type, $already_sent = [] ) {
+    if ( empty( $user_id ) || empty( $notification ) ) {
+        return;
+    }
+    if ( !channel_notification_enabled() || !isset( $notification['post_id'] ) ) {
+        return;
+    }
+    $post_id = $notification['post_id'];
 
-    if ( channel_notification_enabled() && isset( $notification['post_id'] ) ) {
-        $post_id = $notification['post_id'];
 
-        // Ensure a valid source user id has been specified.
-        if ( !empty( $notification['source_user_id'] ) ) {
+    // Obtain handle to user meta data and prep keys.
+    $user_meta = get_user_meta( $user_id );
 
-            // Obtain handle to user meta data and prep keys.
-            $user_meta = get_user_meta( $notification['source_user_id'] );
+    $sms_channel_notification_key = ( $notification_type ?? '' ) . '_sms';
+    $whatsapp_channel_notification_key = ( $notification_type ?? '' ) . '_whatsapp';
 
-            $sms_channel_notification_key = ( $notification_type ?? '' ) . '_sms';
-            $whatsapp_channel_notification_key = ( $notification_type ?? '' ) . '_whatsapp';
+    // Determine the enabled state of the various channel keys.
+    $sms_enabled = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_service_sms_enabled, false );
+    $whatsapp_enabled = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_service_whatsapp_enabled, false );
 
-            // Determine the enabled state of the various channel keys.
-            $sms_enabled = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_service_sms_enabled, false );
-            $whatsapp_enabled = Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_service_whatsapp_enabled, false );
+    // Capture message and build associated link; ensuring to remove all embedded carriage returns.
+    $message = str_replace( "\r\n", '', Disciple_Tools_Notifications::get_notification_message_html( $notification, false ) );
+    $message = str_replace( "\n", '', $message );
+    $link = home_url( '/' ) . get_post_type( $post_id ) . '/' . $post_id;
 
-            // Capture message and build associated link; ensuring to remove all embedded carriage returns.
-            $message = str_replace( "\r\n", '', Disciple_Tools_Notifications::get_notification_message_html( $notification, false ) );
-            $message = str_replace( "\n", '', $message );
-            $link = home_url( '/' ) . get_post_type( $post_id ) . '/' . $post_id;
+    // Process sms channels.
+    if ( $sms_enabled && isset( $user_meta[$sms_channel_notification_key] ) && ( boolval( $user_meta[$sms_channel_notification_key][0] ) === true ) ) {
+        if ( isset( $user_meta['dt_user_work_phone'][0] ) && !empty( trim( $user_meta['dt_user_work_phone'][0] ) ) ) {
+            $sent = Disciple_Tools_Twilio_API::send_sms( $user_meta['dt_user_work_phone'][0], $message );
+        }
+    }
 
-            // Process sms channels.
-            if ( $sms_enabled && isset( $user_meta[$sms_channel_notification_key] ) && ( boolval( $user_meta[$sms_channel_notification_key][0] ) === true ) ) {
-                if ( isset( $user_meta['dt_user_work_phone'][0] ) && !empty( trim( $user_meta['dt_user_work_phone'][0] ) ) ) {
-                    $sent = Disciple_Tools_Twilio_API::send_sms( $user_meta['dt_user_work_phone'][0], $message );
-                }
-            }
-
-            // Process whatsapp channels.
-            if ( $whatsapp_enabled && isset( $user_meta[$whatsapp_channel_notification_key] ) && ( boolval( $user_meta[$whatsapp_channel_notification_key][0] ) === true ) ) {
-                if ( isset( $user_meta['dt_user_work_whatsapp'][0] ) && !empty( trim( $user_meta['dt_user_work_whatsapp'][0] ) ) ) {
-                    $sent = Disciple_Tools_Twilio_API::send_dt_notification_template( $user_meta['dt_user_work_whatsapp'][0], [
-                        '1' => get_bloginfo( 'name' ),
-                        '2' => $message,
-                        '3' => $link
-                    ] );
-                }
-            }
+    // Process whatsapp channels.
+    if ( $whatsapp_enabled && isset( $user_meta[$whatsapp_channel_notification_key] ) && ( boolval( $user_meta[$whatsapp_channel_notification_key][0] ) === true ) ) {
+        if ( isset( $user_meta['dt_user_work_whatsapp'][0] ) && !empty( trim( $user_meta['dt_user_work_whatsapp'][0] ) ) ) {
+            $sent = Disciple_Tools_Twilio_API::send_dt_notification_template( $user_meta['dt_user_work_whatsapp'][0], [
+                '1' => get_bloginfo( 'name' ),
+                '2' => $message,
+                '3' => $link
+            ] );
         }
     }
 }
