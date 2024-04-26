@@ -89,6 +89,18 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
 
     public function main_column() {
         ?>
+        <div style="background-color: rgba(142,195,81,0.2); border-radius: 5px; padding: 2em; margin: 1em 0">
+            <div style="display: flex; grid-gap: 1em">
+                <div style="display: flex; align-items: center">
+                    <img style="width: 2em; filter: invert(52%) sepia(77%) saturate(383%) hue-rotate(73deg) brightness(98%) contrast(83%);"
+                         src="<?php echo esc_url( plugin_dir_url( __FILE__ ) . 'exclamation-circle.svg' ); ?>" alt="Exclamation Circle"/>
+                </div>
+                <div style="display: flex; align-items: center">
+                    Need Help? Check out the documentation:&nbsp;<a href="https://disciple.tools/docs/twilio/" target="_blank">https://disciple.tools/docs/twilio/</a>
+                </div>
+            </div>
+        </div>
+
         <!-- Box -->
         <table class="widefat striped">
             <thead>
