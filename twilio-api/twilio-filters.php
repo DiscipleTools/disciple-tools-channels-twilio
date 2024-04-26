@@ -220,3 +220,21 @@ function send_notification_on_channels( $user_id, $notification, $notification_t
         }
     }
 }
+
+add_filter( 'dt_communication_channel_notification_endpoints_text', 'dt_communication_channel_notification_endpoints_text', 10, 2 );
+function dt_communication_channel_notification_endpoints_text( $endpoints, $user_id ) {
+    if ( empty( $user_id ) ) {
+        return $endpoints;
+    }
+
+    $dt_user_meta = get_user_meta( $user_id );
+    if ( Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_service_sms_enabled, false ) ) {
+        $endpoints[] = sprintf( _x( 'SMS notifications will be sent to: %s', 'SMS notifications will be sent to: [work number]', 'disciple_tools' ), ( isset( $dt_user_meta['dt_user_work_phone'][0] ) && !empty( trim( $dt_user_meta['dt_user_work_phone'][0] ) ) ? $dt_user_meta['dt_user_work_phone'][0] : esc_html( 'none set', 'disciple-tools-channels-twilio' ) ) );
+    }
+
+    if ( Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_service_whatsapp_enabled, false ) ) {
+        $endpoints[] = sprintf( _x( 'Whatsapp notifications will be sent to: %s', 'Whatsapp notifications will be sent to: [whatsapp number]', 'disciple_tools' ), ( isset( $dt_user_meta['dt_user_work_whatsapp'][0] ) && !empty( trim( $dt_user_meta['dt_user_work_whatsapp'][0] ) ) ? $dt_user_meta['dt_user_work_whatsapp'][0] : esc_html( 'none set', 'disciple-tools-channels-twilio' ) ) );
+    }
+
+    return $endpoints;
+}
