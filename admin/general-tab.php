@@ -226,6 +226,14 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
                     </select>
                 </td>
             </tr>
+            <tr>
+                <td>
+                    Webhook URL
+                </td>
+                <td>
+                    <?php echo esc_html( rest_url( '/dt-public/twilio/v1/webhook' ) ); ?>
+                </td>
+            </tr>
         </table>
         <br>
         <span style="float:right;">
