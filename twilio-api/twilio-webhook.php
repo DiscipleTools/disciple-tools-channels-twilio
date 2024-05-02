@@ -92,15 +92,23 @@ class Disciple_Tools_Twilio_Rest
 
     public function dt_comment_created( $post_type, $post_id, $comment_id, $type ){
         //@todo check 24 window
-        if ( $post_type === 'conversations' && $type === 'whatsapp' && class_exists( 'DT_Conversations_API' ) && Disciple_Tools_Twilio_API::is_enabled() ){
-            $conversations_record = DT_Posts::get_post( 'conversations', $post_id );
-            if ( !is_wp_error( $conversations_record ) ){
-                $phone = $conversations_record['name'];
-                $comment = get_comment( $comment_id );
-                $message = $comment->comment_content;
-                Disciple_Tools_Twilio_API::send_whatsapp( $phone, $message );
-            }
+        if ( $post_type !== 'conversations' || $type !== 'whatsapp' ){
+            return;
         }
+        if ( !class_exists( 'DT_Conversations_API' ) || !Disciple_Tools_Twilio_API::is_enabled() ){
+            return;
+        }
+        if ( empty( get_current_user_id() ) ){
+            return;
+        }
+        $conversations_record = DT_Posts::get_post( 'conversations', $post_id );
+        if ( is_wp_error( $conversations_record ) ){
+            return;
+        }
+        $phone = $conversations_record['name'];
+        $comment = get_comment( $comment_id );
+        $message = $comment->comment_content;
+        Disciple_Tools_Twilio_API::send_whatsapp( $phone, $message );
     }
 
     private static $_instance = null;
