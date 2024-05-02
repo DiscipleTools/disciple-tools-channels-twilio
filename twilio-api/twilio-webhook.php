@@ -90,6 +90,19 @@ class Disciple_Tools_Twilio_Rest
         return true;
     }
 
+    public function dt_comment_created( $post_type, $post_id, $comment_id, $type ){
+        //@todo check 24 window
+        if ( $post_type === 'conversations' && $type === 'whatsapp' && class_exists( 'DT_Conversations_API' ) && Disciple_Tools_Twilio_API::is_enabled() ){
+            $conversations_record = DT_Posts::get_post( 'conversations', $post_id );
+            if ( !is_wp_error( $conversations_record ) ){
+                $phone = $conversations_record['name'];
+                $comment = get_comment( $comment_id );
+                $message = $comment->comment_content;
+                Disciple_Tools_Twilio_API::send_whatsapp( $phone, $message );
+            }
+        }
+    }
+
     private static $_instance = null;
     public static function instance() {
         if ( is_null( self::$_instance ) ) {
@@ -99,6 +112,8 @@ class Disciple_Tools_Twilio_Rest
     } // End instance()
     public function __construct() {
         add_action( 'rest_api_init', [ $this, 'add_api_routes' ] );
+        add_action( 'dt_comment_created', [ $this, 'dt_comment_created' ], 10, 4 );
+
     }
     public function has_permission(){
         $pass = false;
