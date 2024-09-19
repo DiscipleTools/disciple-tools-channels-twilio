@@ -119,7 +119,7 @@ class Disciple_Tools_Twilio_Rest
         return self::$_instance;
     } // End instance()
     public function __construct() {
-        add_action( 'rest_api_init', [ $this, 'add_api_routes' ] );
+        add_action( 'disciple_tools_loaded', [ $this, 'disciple_tools_loaded' ] );
         add_action( 'dt_comment_created', [ $this, 'dt_comment_created' ], 10, 4 );
 
     }
@@ -131,6 +131,10 @@ class Disciple_Tools_Twilio_Rest
             }
         }
         return $pass;
+    }
+
+    public function disciple_tools_loaded(): void {
+        add_action( 'rest_api_init', [ $this, 'add_api_routes' ] );
     }
 }
 Disciple_Tools_Twilio_Rest::instance();
