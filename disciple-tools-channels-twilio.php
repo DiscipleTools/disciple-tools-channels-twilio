@@ -57,7 +57,7 @@ function disciple_tools_channels_twilio() {
     return Disciple_Tools_Channels_Twilio::instance();
 }
 
-add_action( 'after_setup_theme', 'disciple_tools_channels_twilio', 20 );
+add_action( 'disciple_tools_load_plugins', 'disciple_tools_channels_twilio', 20 );
 
 /**
  * Singleton class for setting up the plugin.
