@@ -599,7 +599,7 @@ class Disciple_Tools_Twilio_API {
         return true;
     }
 
-    public static function send_dt_notification_template( $phone_number, $template_variables, $template_id = 'dt_notifications', $callback_url = null ): bool {
+    public static function send_dt_notification_template( $phone_number, $template_variables, $template_id = 'dt_notifications', $status_callback_url = null ): bool {
         if ( ! self::has_credentials() ) {
             return false;
         }
@@ -643,8 +643,8 @@ class Disciple_Tools_Twilio_API {
                     if ( !empty( $template_variables ) ) {
                         $msg_opts['contentVariables'] = json_encode( $template_variables );
                     }
-                    if ( !empty( $callback_url ) ) {
-                        $msg_opts['statusCallback'] = $callback_url;
+                    if ( !empty( $status_callback_url ) ) {
+                        $msg_opts['statusCallback'] = $status_callback_url;
                     }
 
                     // Dispatch message...!
