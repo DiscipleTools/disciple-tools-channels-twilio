@@ -66,6 +66,25 @@ $bool_result = dt_twilio_direct_send( 343, 'post', $msg, [ 'service' => 'sms' ] 
     - whatsapp
 
 
+## Webhooks
+Set twilio to call this webhook
+```
+POST https://your-site.com/dt-public/twilio/v1/webhook
+```
+A `dt_twilio_message_received` action will be triggered when a message is received by Twilio.
+```
+/**
+ * $type: 'sms' or 'whatsapp'
+ * $params: array of the message
+ * $params['Body']: the message
+ * $params['From']: the phone number
+ * See all params here: https://www.twilio.com/docs/messaging/guides/webhook-request
+ */
+add_action( 'dt_twilio_message_received', function ( $type, $params ){
+    //do stuff here
+}, 10, 2 );
+```
+
 
 ## Contribution
 
