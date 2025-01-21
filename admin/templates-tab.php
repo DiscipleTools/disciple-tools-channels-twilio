@@ -18,7 +18,6 @@ class Disciple_Tools_Channels_Twilio_Tab_Templates {
     }
 
     private function process_updates() {
-
     }
 
     public function process_scripts(): void {

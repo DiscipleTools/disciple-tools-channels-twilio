@@ -55,7 +55,6 @@ function disciple_tools_channels_twilio() {
     }
 
     return Disciple_Tools_Channels_Twilio::instance();
-
 }
 
 add_action( 'after_setup_theme', 'disciple_tools_channels_twilio', 20 );
@@ -101,7 +100,6 @@ class Disciple_Tools_Channels_Twilio {
         require_once( 'twilio-api/twilio-api.php' );
         require_once( 'twilio-api/twilio-filters.php' );
         require_once( 'twilio-api/twilio-webhook.php' );
-
     }
 
     /**

@@ -121,7 +121,6 @@ class Disciple_Tools_Twilio_Rest
     public function __construct() {
         add_action( 'rest_api_init', [ $this, 'add_api_routes' ] );
         add_action( 'dt_comment_created', [ $this, 'dt_comment_created' ], 10, 4 );
-
     }
     public function has_permission(){
         $pass = false;

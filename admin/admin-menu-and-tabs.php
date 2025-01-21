@@ -39,7 +39,6 @@ class Disciple_Tools_Channels_Twilio_Menu {
 
         add_action( 'admin_menu', array( $this, 'register_menu' ) );
         add_action( 'admin_enqueue_scripts', [ $this, 'load_scripts' ], 10, 1 );
-
     } // End __construct()
 
     /**
