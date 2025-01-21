@@ -69,7 +69,7 @@ $bool_result = dt_twilio_direct_send( 343, 'post', $msg, [ 'service' => 'sms' ] 
 ## Webhooks
 Set twilio to call this webhook
 ```
-POST https://your-site.com/dt-public/twilio/v1/webhook
+POST https://your-site.com/wp-json/dt-public/twilio/v1/webhook
 ```
 A `dt_twilio_message_received` action will be triggered when a message is received by Twilio.
 ```
