@@ -599,7 +599,7 @@ class Disciple_Tools_Twilio_API {
         return true;
     }
 
-    public static function send_dt_notification_template( $phone_number, $template_variables, $template_id = 'dt_notifications' ): bool {
+    public static function send_dt_notification_template( $phone_number, $template_variables, $template_id = 'dt_notifications', $status_callback_url = null ): bool {
         if ( ! self::has_credentials() ) {
             return false;
         }
@@ -639,8 +639,13 @@ class Disciple_Tools_Twilio_API {
                         'from' => $service_prefix . $from_number,
                         'messagingServiceSid' => $messaging_service_id,
                         'contentSid' => $content_id,
-                        'contentVariables' => json_encode( $template_variables )
                     ];
+                    if ( !empty( $template_variables ) ) {
+                        $msg_opts['contentVariables'] = json_encode( $template_variables );
+                    }
+                    if ( !empty( $status_callback_url ) ) {
+                        $msg_opts['statusCallback'] = $status_callback_url;
+                    }
 
                     // Dispatch message...!
                     $message_result = $twilio->messages->create(
