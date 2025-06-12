@@ -17,7 +17,17 @@ function dt_twilio_sending_channels( $channels ) {
     return $channels;
 }
 
+add_filter( 'dt_magic_link_template_messages', 'dt_twilio_magic_link_template_messages', 10, 1 );
+function dt_twilio_magic_link_template_messages( $messages ): array {
+    return array_merge( $messages, Disciple_Tools_Twilio_API::list_messaging_templates_statuses() );
+}
+
 function dt_twilio_sending_channel_send( $params, $args = [] ): bool {
+    if ( !empty( $params['template_message_id'] ) ) {
+        $args['content_sid'] = $params['template_message_id'];
+        $args['content_variables'] = $params['message'] ?? null; // If set, should adopt a variable mapping JSON structure.
+    }
+
     return Disciple_Tools_Twilio_API::is_enabled() && Disciple_Tools_Twilio_API::send( $params['user'], $params['message'], $args );
 }
 
