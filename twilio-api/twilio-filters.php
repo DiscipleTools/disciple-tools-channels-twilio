@@ -19,13 +19,64 @@ function dt_twilio_sending_channels( $channels ) {
 
 add_filter( 'dt_magic_link_template_messages', 'dt_twilio_magic_link_template_messages', 10, 1 );
 function dt_twilio_magic_link_template_messages( $messages ): array {
-    return array_merge( $messages, Disciple_Tools_Twilio_API::list_messaging_templates_statuses() );
+
+    // Fetch default content templates.
+    $default_templates = Disciple_Tools_Twilio_API::list_messaging_templates();
+
+    // Hydrate default templates with fetched content ids.
+    $twilio_template_statuses = Disciple_Tools_Twilio_API::list_messaging_templates_statuses();
+    foreach ( $default_templates as $template_id => $template ) {
+        if ( isset( $template['name'] ) ) {
+            foreach ( $twilio_template_statuses as $status ) {
+                if ( $status['name'] === $template['name'] ) {
+                    $template['content_id'] = $status['id'];
+                    $messages[ $template_id ] = $template;
+                    break;
+                }
+            }
+        }
+    }
+
+    return $messages;
 }
 
 function dt_twilio_sending_channel_send( $params, $args = [] ): bool {
     if ( !empty( $params['template_message_id'] ) ) {
-        $args['content_sid'] = $params['template_message_id'];
-        $args['content_variables'] = $params['message'] ?? null; // If set, should adopt a variable mapping JSON structure.
+        $template_message_id = $params['template_message_id'];
+
+        // Fetch template message, assuming we have valid parameter placeholders.
+        if ( !empty( $params['placeholders'] ) ) {
+            $placeholders = $params['placeholders'];
+            $template_messages = apply_filters( 'dt_magic_link_template_messages', [] );
+
+            if ( isset( $template_messages[ $template_message_id ] ) ) {
+                $template_message = $template_messages[ $template_message_id ];
+                
+                // Capture corresponding content sid.
+                if ( isset( $template_message['content_id'] ) ) {
+                    $args['content_sid'] = $template_message['content_id'];
+                }
+
+                // Convert placeholder mappings to a JSON content variables string.
+                if ( isset( $template_message['ml_msg_placeholder_mappings'] ) ) {
+                    $args['content_variables'] = str_replace(
+                        [
+                            '{{name}}',
+                            '{{link}}',
+                            '{{time}}',
+                            '{{time_relative}}'
+                        ],
+                        [
+                            $placeholders['name'],
+                            $placeholders['link'],
+                            $placeholders['time'],
+                            $placeholders['time_relative']
+                        ],
+                        json_encode( $template_message['ml_msg_placeholder_mappings'] )
+                    );
+                }                
+            }
+        }        
     }
 
     return Disciple_Tools_Twilio_API::is_enabled() && Disciple_Tools_Twilio_API::send( $params['user'], $params['message'], $args );

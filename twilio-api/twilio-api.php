@@ -94,7 +94,7 @@ class Disciple_Tools_Twilio_API {
                     'language' => 'en',
                     'variables' => [
                         '1' => 'Disciple Tools',
-                        '2' => 'John mentioned you on contact Bob saying: @Jared, can you respond?',
+                        '2' => 'Someone mentioned @admin on a record.',
                         '3' => 'http://example.com/contact/123/'
                     ],
                     'types' => [
@@ -102,6 +102,39 @@ class Disciple_Tools_Twilio_API {
                             'body' => 'You received a notification on {{1}}.\n\nHere is the message: {{2}}.\n\nPlease open {{3}} to respond.'
                         ]
                     ]
+                ],
+                'ml_msg' => 'You received a notification on Disciple Tools.\n\nHere is the message: Someone mentioned @{{name}} on a record..\n\nPlease open {{link}} to respond.',
+                'ml_msg_placeholder_mappings' => [
+                    '1' => 'Disciple Tools',
+                    '2' => 'Someone mentioned @{{name}} on a record.',
+                    '3' => '{{link}}'
+                ]
+            ],
+            'update_record' => [
+                'id' => 'update_record',
+                'name' => 'Update Record',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => 'Update Record',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => 'John Smith',
+                        '2' => 'September 8, 2025 01:59:46 PM BST',
+                        '3' => 'https://example.com/contact/123/'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => 'Hello {{1}},\n\nA record update is required before {{2}}.\n\nPlease open {{3}} to respond.'
+                        ]
+                    ]
+                ],
+                'ml_msg' => 'Hello {{name}},\n\nA record update is required before {{time}}.\n\nPlease open {{link}} to respond.',
+                'ml_msg_placeholder_mappings' => [
+                    '1' => '{{name}}',
+                    '2' => '{{time}}',
+                    '3' => '{{link}}'
                 ]
             ]
         ];
