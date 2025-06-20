@@ -51,7 +51,7 @@ function dt_twilio_sending_channel_send( $params, $args = [] ): bool {
 
             if ( isset( $template_messages[ $template_message_id ] ) ) {
                 $template_message = $template_messages[ $template_message_id ];
-                
+
                 // Capture corresponding content sid.
                 if ( isset( $template_message['content_id'] ) ) {
                     $args['content_sid'] = $template_message['content_id'];
@@ -74,9 +74,9 @@ function dt_twilio_sending_channel_send( $params, $args = [] ): bool {
                         ],
                         json_encode( $template_message['ml_msg_placeholder_mappings'] )
                     );
-                }                
+                }
             }
-        }        
+        }
     }
 
     return Disciple_Tools_Twilio_API::is_enabled() && Disciple_Tools_Twilio_API::send( $params['user'], $params['message'], $args );

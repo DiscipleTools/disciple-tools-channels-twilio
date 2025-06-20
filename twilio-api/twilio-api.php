@@ -528,8 +528,8 @@ class Disciple_Tools_Twilio_API {
 
                 // Capture new content parameters.
                 if ( isset( $args['content_sid'], $args['content_variables'] ) ) {
-                    $msg_opts['contentSid'] =  $args['content_sid'];
-                    $msg_opts['contentVariables'] =  $args['content_variables'];
+                    $msg_opts['contentSid'] = $args['content_sid'];
+                    $msg_opts['contentVariables'] = $args['content_variables'];
                 }
 
                 $assigned_numbers_id = self::get_option( ( ( $current_service === 'sms' ) ? self::$option_twilio_assigned_numbers_sms_id : self::$option_twilio_assigned_numbers_whatsapp_id ) );
