@@ -94,7 +94,7 @@ class Disciple_Tools_Twilio_API {
                     'language' => 'en',
                     'variables' => [
                         '1' => 'Disciple Tools',
-                        '2' => 'Someone mentioned @admin on a record.',
+                        '2' => 'John mentioned you on contact Bob saying: @Jared, can you respond?',
                         '3' => 'http://example.com/contact/123/'
                     ],
                     'types' => [
