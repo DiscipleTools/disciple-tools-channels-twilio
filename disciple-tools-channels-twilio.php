@@ -5,7 +5,7 @@
  * Description: Disciple Tools - Channels - Twilio plugin; which captures settings enabling communication with target Twilio platform.
  * Text Domain: disciple-tools-channels-twilio
  * Domain Path: /languages
- * Version:  1.3.3
+ * Version:  1.4.0
  * Author URI: https://github.com/DiscipleTools
  * GitHub Plugin URI: https://github.com/DiscipleTools/disciple-tools-channels-twilio
  * Requires at least: 4.7.0
