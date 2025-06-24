@@ -194,7 +194,7 @@ class Disciple_Tools_Channels_Twilio {
      * @since  0.1
      * @access public
      */
-    public function __call( $method = '', $args = array() ) {
+    public function __call( $method = '', $args = [] ) {
         _doing_it_wrong( 'disciple_tools_channels_twilio::' . esc_html( $method ), 'Method does not exist.', '0.1' );
         unset( $method, $args );
 

@@ -21,22 +21,22 @@ class Disciple_Tools_Channels_Twilio_Tab_Templates {
     }
 
     public function process_scripts(): void {
-        dt_theme_enqueue_style( 'material-font-icons-local', 'dt-core/dependencies/mdi/css/materialdesignicons.min.css', array() );
-        wp_enqueue_style( 'material-font-icons', 'https://cdn.jsdelivr.net/npm/@mdi/font@6.6.96/css/materialdesignicons.min.css', array(), '6.6.96' );
+        dt_theme_enqueue_style( 'material-font-icons-local', 'dt-core/dependencies/mdi/css/materialdesignicons.min.css', [] );
+        wp_enqueue_style( 'material-font-icons', 'https://cdn.jsdelivr.net/npm/@mdi/font@6.6.96/css/materialdesignicons.min.css', [], '6.6.96' );
 
         wp_enqueue_script( 'dt_channels_twilio_templates_script', plugin_dir_url( __FILE__ ) . 'js/templates-tab.js', [
             'jquery',
             'lodash'
         ], filemtime( dirname( __FILE__ ) . '/js/templates-tab.js' ), true );
         wp_localize_script(
-            'dt_channels_twilio_templates_script', 'dt_channels_twilio', array(
+            'dt_channels_twilio_templates_script', 'dt_channels_twilio', [
                 'messaging_templates' => Disciple_Tools_Twilio_API::list_messaging_templates() ?? [],
                 'messaging_templates_statuses' => Disciple_Tools_Twilio_API::list_messaging_templates_statuses( [ 'avoid_duplicates' => true ] ) ?? [],
                 'messaging_templates_settings' => Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_messaging_templates, [] ),
                 'dt_endpoint_upload_messaging_template' => Disciple_Tools_Twilio_API::fetch_endpoint_upload_messaging_template_url(),
                 'dt_endpoint_submit_messaging_template' => Disciple_Tools_Twilio_API::fetch_endpoint_submit_messaging_template_url(),
                 'dt_endpoint_reset_messaging_template' => Disciple_Tools_Twilio_API::fetch_endpoint_reset_messaging_template_url()
-            )
+            ]
         );
     }
 
