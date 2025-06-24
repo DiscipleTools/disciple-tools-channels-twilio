@@ -19,12 +19,12 @@ class Disciple_Tools_Channels_Twilio_Tab_General {
             'lodash'
         ], filemtime( dirname( __FILE__ ) . '/js/general-tab.js' ), true );
         wp_localize_script(
-            'dt_channels_twilio_general_script', 'dt_channels_twilio', array(
+            'dt_channels_twilio_general_script', 'dt_channels_twilio', [
                 'dt_endpoint_list_phone_numbers' => Disciple_Tools_Twilio_API::fetch_endpoint_list_phone_numbers_url(),
                 'dt_endpoint_template_actions' => Disciple_Tools_Twilio_API::fetch_endpoint_template_actions_url(),
                 'assigned_numbers_sms_id' => Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_assigned_numbers_sms_id ),
                 'assigned_numbers_whatsapp_id' => Disciple_Tools_Twilio_API::get_option( Disciple_Tools_Twilio_API::$option_twilio_assigned_numbers_whatsapp_id )
-            )
+            ]
         );
     }
 

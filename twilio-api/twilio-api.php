@@ -102,6 +102,39 @@ class Disciple_Tools_Twilio_API {
                             'body' => 'You received a notification on {{1}}.\n\nHere is the message: {{2}}.\n\nPlease open {{3}} to respond.'
                         ]
                     ]
+                ],
+                'ml_msg' => 'You received a notification on Disciple Tools.\n\nHere is the message: Someone mentioned @{{name}} on a record..\n\nPlease open {{link}} to respond.',
+                'ml_msg_placeholder_mappings' => [
+                    '1' => 'Disciple Tools',
+                    '2' => 'Someone mentioned @{{name}} on a record.',
+                    '3' => '{{link}}'
+                ]
+            ],
+            'update_record' => [
+                'id' => 'update_record',
+                'name' => 'Update Record',
+                'type' => 'whatsapp',
+                'enabled' => true,
+                'content_category' => 'UTILITY',
+                'content_template' => [
+                    'friendly_name' => 'Update Record',
+                    'language' => 'en',
+                    'variables' => [
+                        '1' => 'John Smith',
+                        '2' => 'September 8, 2025 01:59:46 PM BST',
+                        '3' => 'https://example.com/contact/123/'
+                    ],
+                    'types' => [
+                        'twilio/text' => [
+                            'body' => 'Hello {{1}},\n\nA record update is required before {{2}}.\n\nPlease open {{3}} to respond.'
+                        ]
+                    ]
+                ],
+                'ml_msg' => 'Hello {{name}},\n\nA record update is required before {{time}}.\n\nPlease open {{link}} to respond.',
+                'ml_msg_placeholder_mappings' => [
+                    '1' => '{{name}}',
+                    '2' => '{{time}}',
+                    '3' => '{{link}}'
                 ]
             ]
         ];
@@ -492,6 +525,12 @@ class Disciple_Tools_Twilio_API {
                     'body' => $message,
                     'messagingServiceSid' => $messaging_service->sid
                 ];
+
+                // Capture new content parameters.
+                if ( isset( $args['content_sid'], $args['content_variables'] ) ) {
+                    $msg_opts['contentSid'] = $args['content_sid'];
+                    $msg_opts['contentVariables'] = $args['content_variables'];
+                }
 
                 $assigned_numbers_id = self::get_option( ( ( $current_service === 'sms' ) ? self::$option_twilio_assigned_numbers_sms_id : self::$option_twilio_assigned_numbers_whatsapp_id ) );
                 if ( !empty( $assigned_numbers_id ) ) {
