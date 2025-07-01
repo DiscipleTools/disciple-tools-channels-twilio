@@ -31,22 +31,26 @@ jobs:
 
     name: PHP ${{ matrix.php }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16.x
+          node-version: 20.x
 
       - name: Install PHP
-        uses: shivammathur/setup-php@master
+        uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+          extensions: mysqli, mbstring, curl
 
       - name: Report PHP version
         run: php -v
 
       - name: Install dependencies
         run: composer install --no-interaction
+
+      - name: Configure PHPCS
+        run: vendor/bin/phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcsstandards/phpcsextra,vendor/phpcsstandards/phpcsutils
 
       - name: Test Syntax
         run: ./test/test_for_syntax_errors.sh
