@@ -5,7 +5,7 @@
     "squizlabs/php_codesniffer": "*"
   },
   "require": {
-    "twilio/sdk": "^6.28"
+    "twilio/sdk": "^8.6"
   },
   "config": {
     "allow-plugins": {
