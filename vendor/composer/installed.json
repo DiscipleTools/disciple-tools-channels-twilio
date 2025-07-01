@@ -264,17 +264,17 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.13.2",
-            "version_normalized": "3.13.2.0",
+            "version": "3.13.1",
+            "version_normalized": "3.13.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "5b5e3821314f947dd040c70f7992a64eac89025c"
+                "reference": "1b71b4dd7e7ef651ac749cea67e513c0c832f4bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/5b5e3821314f947dd040c70f7992a64eac89025c",
-                "reference": "5b5e3821314f947dd040c70f7992a64eac89025c",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/1b71b4dd7e7ef651ac749cea67e513c0c832f4bd",
+                "reference": "1b71b4dd7e7ef651ac749cea67e513c0c832f4bd",
                 "shasum": ""
             },
             "require": {
@@ -286,7 +286,7 @@
             "require-dev": {
                 "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.3.4"
             },
-            "time": "2025-06-17T22:17:01+00:00",
+            "time": "2025-06-12T15:04:34+00:00",
             "bin": [
                 "bin/phpcbf",
                 "bin/phpcs"
@@ -351,30 +351,31 @@
         },
         {
             "name": "twilio/sdk",
-            "version": "6.44.4",
-            "version_normalized": "6.44.4.0",
+            "version": "8.6.3",
+            "version_normalized": "8.6.3.0",
             "source": {
                 "type": "git",
-                "url": "git@github.com:twilio/twilio-php.git",
-                "reference": "08aad5f377e2245b9cd7508e7762d95e7392fa4d"
+                "url": "https://github.com/twilio/twilio-php",
+                "reference": "0adab66d4ebb0fa2780ad3c9332f495cc78b44c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twilio/twilio-php/zipball/08aad5f377e2245b9cd7508e7762d95e7392fa4d",
-                "reference": "08aad5f377e2245b9cd7508e7762d95e7392fa4d",
+                "url": "https://api.github.com/repos/twilio/twilio-php/zipball/0adab66d4ebb0fa2780ad3c9332f495cc78b44c6",
+                "reference": "0adab66d4ebb0fa2780ad3c9332f495cc78b44c6",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.1.0"
             },
             "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
                 "guzzlehttp/guzzle": "^6.3 || ^7.0",
                 "phpunit/phpunit": ">=7.0 < 10"
             },
             "suggest": {
                 "guzzlehttp/guzzle": "An HTTP client to execute the API requests"
             },
-            "time": "2023-02-22T19:59:53+00:00",
+            "time": "2025-06-12T10:34:08+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
