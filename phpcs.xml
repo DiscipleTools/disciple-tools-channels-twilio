@@ -25,6 +25,7 @@
 
   <exclude-pattern>vendor/*</exclude-pattern>
   <exclude-pattern>includes/admin/libraries/plugin-update-checker/*</exclude-pattern>
+  <exclude-pattern>test-*.php</exclude-pattern>
 
   <arg name="extensions" value="php,inc,lib"/>
   <arg value="n"/>
@@ -201,7 +202,10 @@
   <rule ref="Generic.WhiteSpace.ScopeIndent">
     <properties>
       <property name="indent" value="4"/>
-      <property name="ignoreIndentationTokens" type="array" value="T_COMMENT,T_DOC_COMMENT_OPEN_TAG"/>
+      <property name="ignoreIndentationTokens" type="array">
+        <element value="T_COMMENT"/>
+        <element value="T_DOC_COMMENT_OPEN_TAG"/>
+      </property>
     </properties>
   </rule>
   <rule ref="PSR2.ControlStructures.ElseIfDeclaration"/>
